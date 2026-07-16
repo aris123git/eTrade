@@ -77,6 +77,51 @@ class BrokerSource(ABC):
     ) -> List[OHLCVBar]:
         """Download OHLCV bars for one broker symbol + timeframe."""
 
+    def download_ticks(
+        self,
+        broker_symbol: str,
+        *,
+        start: Optional[datetime] = None,
+        end: Optional[datetime] = None,
+        count: Optional[int] = None,
+    ) -> List[Dict[str, Any]]:
+        """
+        Download tick history when the broker source supports it.
+
+        Default: empty list (source has no tick API). MT5 overrides this.
+        """
+        return []
+
+    def detect_available_history(
+        self,
+        broker_symbol: str,
+        timeframe: str,
+    ) -> Dict[str, Any]:
+        """
+        Probe how far back a broker can supply bars for a symbol/timeframe.
+
+        Default implementation downloads a small probe window.
+        """
+        end = datetime.utcnow()
+        bars = self.download_bars(broker_symbol, timeframe, end=end, count=1)
+        if not bars:
+            return {"available": False, "first": None, "last": None}
+        # Walk backward in large chunks to estimate earliest available bar
+        earliest = bars[0].timestamp
+        cursor = earliest
+        for days in (3650, 1825, 730, 365, 180, 90, 30):
+            probe_start = cursor - __import__("datetime").timedelta(days=days)
+            chunk = self.download_bars(broker_symbol, timeframe, start=probe_start, end=cursor)
+            if not chunk:
+                continue
+            earliest = min(earliest, chunk[0].timestamp)
+            cursor = earliest
+        return {
+            "available": True,
+            "first": earliest.isoformat(timespec="seconds"),
+            "last": bars[-1].timestamp.isoformat(timespec="seconds"),
+        }
+
     def broker_metadata(self) -> Dict[str, Any]:
         """Optional metadata stored on the brokers row."""
         return {"source_type": self.source_type, "source_name": self.name}

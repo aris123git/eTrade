@@ -164,3 +164,74 @@ class MT5BrokerSource(BrokerSource):
                 )
             )
         return bars
+
+    def download_ticks(
+        self,
+        broker_symbol: str,
+        *,
+        start: Optional[datetime] = None,
+        end: Optional[datetime] = None,
+        count: Optional[int] = None,
+    ) -> List[Dict[str, Any]]:
+        """Download tick history via MT5 copy_ticks_range / copy_ticks_from."""
+        if mt5 is None:
+            return []
+        mt5.symbol_select(broker_symbol, True)
+        end = end or datetime.utcnow()
+        ticks = None
+        if count is not None:
+            ticks = mt5.copy_ticks_from(broker_symbol, end, int(count), mt5.COPY_TICKS_ALL)
+        else:
+            start = start or (end - timedelta(days=7))
+            ticks = mt5.copy_ticks_range(broker_symbol, start, end, mt5.COPY_TICKS_ALL)
+        if ticks is None:
+            return []
+        out: List[Dict[str, Any]] = []
+        names = set(ticks.dtype.names or [])
+        for row in ticks:
+            if "time_msc" in names:
+                ts = datetime.utcfromtimestamp(float(row["time_msc"]) / 1000.0)
+            else:
+                ts = datetime.utcfromtimestamp(int(row["time"]))
+            out.append(
+                {
+                    "timestamp": ts,
+                    "bid": float(row["bid"]),
+                    "ask": float(row["ask"]),
+                    "last": float(row["last"]) if "last" in names else 0.0,
+                    "volume": float(row["volume"]) if "volume" in names else 0.0,
+                    "flags": int(row["flags"]) if "flags" in names else 0,
+                }
+            )
+        return out
+
+    def detect_available_history(
+        self,
+        broker_symbol: str,
+        timeframe: str,
+    ) -> Dict[str, Any]:
+        """Use MT5 symbol_info to detect terminal-available history bounds when possible."""
+        if mt5 is None:
+            return {"available": False, "first": None, "last": None}
+        from core.config import TIMEFRAMES
+
+        tf = TIMEFRAMES.get(timeframe.upper())
+        if tf is None:
+            return {"available": False, "first": None, "last": None}
+        mt5.symbol_select(broker_symbol, True)
+        # Probe farthest practical window (broker-dependent)
+        end = datetime.utcnow()
+        start = end - timedelta(days=365 * 20)
+        rates = mt5.copy_rates_range(broker_symbol, tf, start, end)
+        if rates is None or len(rates) == 0:
+            rates = mt5.copy_rates_from(broker_symbol, tf, end, 1000)
+        if rates is None or len(rates) == 0:
+            return {"available": False, "first": None, "last": None}
+        first = datetime.utcfromtimestamp(int(rates[0]["time"]))
+        last = datetime.utcfromtimestamp(int(rates[-1]["time"]))
+        return {
+            "available": True,
+            "first": first.isoformat(timespec="seconds"),
+            "last": last.isoformat(timespec="seconds"),
+            "bars_available": int(len(rates)),
+        }

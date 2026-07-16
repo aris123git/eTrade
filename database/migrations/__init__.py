@@ -14,6 +14,7 @@ MIGRATIONS: List[Tuple[str, str]] = [
     ("001_initial_schema", "create_schema"),
     ("002_indexes", "create_indexes"),
     ("003_multi_broker_identity", "multi_broker"),
+    ("004_research_archive", "research_schema"),
 ]
 
 
@@ -59,6 +60,10 @@ def apply_migrations(db: Any) -> List[str]:
         elif action == "multi_broker":
             # Already applied above; create indexes again for new columns
             create_indexes(db)
+        elif action == "research_schema":
+            from database.migrations.research_schema import apply_research_schema
+
+            apply_research_schema(db)
         _record(db, version)
         applied.append(version)
     return applied

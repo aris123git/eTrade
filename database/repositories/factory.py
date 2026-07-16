@@ -25,6 +25,7 @@ def _repo_map():
     from database.repositories.currency_repository import CurrencyRepository
     from database.repositories.market_repository import MarketRepository
     from database.repositories.symbol_repository import SymbolRepository
+    from database.repositories.research_repository import ResearchRepository
     from database.repositories.tick_repository import TickRepository
     from database.repositories.timeframe_repository import TimeframeRepository
 
@@ -33,6 +34,7 @@ def _repo_map():
         "candles": CandleRepository,
         "currencies": CurrencyRepository,
         "markets": MarketRepository,
+        "research": ResearchRepository,
         "symbols": SymbolRepository,
         "ticks": TickRepository,
         "timeframes": TimeframeRepository,

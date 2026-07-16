@@ -253,8 +253,8 @@ class DataDownloadConfig:
     min_bars: int = 2000
     years: int = 5
     currency_pairs_only: bool = False
-    allow_synthetic_fallback: bool = True
-    require_validated: bool = False  # when True, train only on PASS series
+    allow_synthetic_fallback: bool = False  # production path: never invent bars
+    require_validated: bool = True  # train only on PASS series by default
     brokers_config: Optional[str] = None  # path to config/brokers.json
     csv_brokers: Dict[str, str] = field(default_factory=dict)  # name -> dir
     include_mt5: bool = True
@@ -267,10 +267,10 @@ class DataDownloadConfig:
 @dataclass
 class ResearchConfig:
     """
-    Autonomous quant research loop.
+    Autonomous quant research engine configuration.
 
-    Automates collect → validate → repair → learn → gate → backtest → paper →
-    report. Cannot invent market history that no source provides.
+    Continuously expands history, discovers hypotheses, validates strictly,
+    paper-trades, and promotes only superior models. Does not invent market data.
     """
 
     enabled: bool = True
@@ -282,8 +282,11 @@ class ResearchConfig:
     )
     history_start: str = "2010-01-01"
     repair_failed_series: bool = True
-    require_validated: bool = False
+    download_ticks: bool = True
+    tick_lookback_days: int = 7
+    require_validated: bool = True
     skip_collect: bool = False
+    allow_synthetic: bool = False
     model_candidates: List[str] = field(
         default_factory=lambda: ["random_forest", "lightgbm", "xgboost"]
     )
@@ -293,13 +296,31 @@ class ResearchConfig:
     metric_minimize: bool = False
     min_improvement: float = 0.005
     register_only_improvements: bool = True
+    run_feature_discovery: bool = True
+    run_strict_validation: bool = True
     run_backtest: bool = True
     run_paper_trade: bool = True
     paper_equity: float = 10_000.0
     detect_drift: bool = True
     generate_hypotheses: bool = True
+    run_self_improve: bool = True
+    run_production_gate: bool = True
+    build_dashboard: bool = True
+    # Production readiness thresholds
+    min_paper_trades: int = 50
+    min_paper_days: float = 14.0
+    min_live_sharpe: float = 0.5
+    max_live_drawdown: float = 0.20
+    min_live_profit_factor: float = 1.2
+    # Strict validation thresholds
+    min_val_score: float = 0.50
+    min_oos_score: float = 0.50
+    min_walk_forward_score: float = 0.50
+    max_mc_ruin_prob: float = 0.30
+    min_backtest_trades: int = 5
     reports_dir: str = "research_cycles"
     state_filename: str = "research_state.json"
+    dashboard_dir: str = "dashboards"
 
 
 # ==============================================================================

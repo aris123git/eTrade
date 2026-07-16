@@ -59,6 +59,7 @@ class RepositoryManager:
         ('symbols', None, None),
         ('candles', None, None),
         ('ticks', None, None),
+        ('research', None, None),
     ]
     
     def __init__(self, db_manager: DatabaseManager):
@@ -122,6 +123,7 @@ class RepositoryManager:
         from database.repositories.candle_repository import CandleRepository
         from database.repositories.currency_repository import CurrencyRepository
         from database.repositories.market_repository import MarketRepository
+        from database.repositories.research_repository import ResearchRepository
         from database.repositories.symbol_repository import SymbolRepository
         from database.repositories.tick_repository import TickRepository
         from database.repositories.timeframe_repository import TimeframeRepository
@@ -134,6 +136,7 @@ class RepositoryManager:
             'symbols': SymbolRepository,
             'candles': CandleRepository,
             'ticks': TickRepository,
+            'research': ResearchRepository,
         }
         updated = []
         for name, _cls, dep in self.REPOSITORIES:
