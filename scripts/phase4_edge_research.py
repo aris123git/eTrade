@@ -166,8 +166,15 @@ def _try_mt5_download(db: DatabaseManager, repos) -> bool:
         from collector.downloader import Downloader
         from core.config import TIMEFRAMES as MT5_TF
 
-        # Ensure markets exist for requested symbols
+        # Discover ALL FX currency pairs (not stocks/crypto/metals)
+        manager = SymbolManager(db)
+        saved = manager.discover(currency_pairs_only=True, select_all=True)
+        print(f"MT5 discovered {len(saved)} currency pairs")
+
+        # Also ensure any PHASE4_SYMBOLS env overrides are present
         for symbol in SYMBOLS:
+            if symbol in saved:
+                continue
             info = mt5.symbol_info(symbol)
             if info is None:
                 mt5.symbol_select(symbol, True)
@@ -187,14 +194,14 @@ def _try_mt5_download(db: DatabaseManager, repos) -> bool:
                     quote_currency=getattr(info, "currency_profit", None),
                 )
 
-        # Restrict downloader timeframes to requested ones
+        # Restrict downloader timeframes to requested research TFs
         tf_map = {k: v for k, v in MT5_TF.items() if k in TIMEFRAMES}
         if not tf_map:
             tf_map = {TIMEFRAMES[0]: MT5_TF.get(TIMEFRAMES[0], list(MT5_TF.values())[0])}
 
         downloader = Downloader(db, tf_map)
         ok = downloader.download_all()
-        print(f"MT5 download_all -> {ok}")
+        print(f"MT5 download_all ({len(saved)} FX pairs × {list(tf_map)}) -> {ok}")
         return bool(ok)
     except Exception as exc:
         print(f"MT5 download path failed: {type(exc).__name__}: {exc}")
