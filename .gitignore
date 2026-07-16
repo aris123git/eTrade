@@ -1,8 +1,11 @@
+*$py.class
+ai_artifacts/
+data/database/*.db
+data/database/*.db-*
+*.egg-info/
+logs/
 __pycache__/
 *.py[cod]
-*$py.class
 .pytest_cache/
-ai_artifacts/
-*.egg-info/
 .venv/
 venv/

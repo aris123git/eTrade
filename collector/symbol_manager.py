@@ -6,7 +6,10 @@ Discovers every MT5 symbol and stores metadata
 =========================================================
 """
 
-import MetaTrader5 as mt5
+try:
+    import MetaTrader5 as mt5
+except ImportError:
+    mt5 = None
 
 from database.models import MarketModel
 
@@ -21,6 +24,9 @@ class SymbolManager:
     # --------------------------------------------------
 
     def get_all_symbols(self):
+
+        if mt5 is None:
+            return []
 
         symbols = mt5.symbols_get()
 
