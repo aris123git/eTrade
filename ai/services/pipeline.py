@@ -83,7 +83,40 @@ class AIPipeline:
             from ai.data.auto_download import AIMarketDataService
 
             self.data_service = AIMarketDataService(config=self.config)
-        return self.data_service.ensure(force=force)
+        result = self.data_service.ensure(force=force)
+        if self.config.data.require_validated:
+            self.assert_history_validated()
+        return result
+
+    def assert_history_validated(self) -> Any:
+        """Fail fast unless required symbol×timeframe series PASS validation."""
+        from collector.history_validator import HistoryValidator
+        from database.core.connection import DatabaseManager
+        from core.config import DATABASE_PATH
+        from pathlib import Path
+
+        db = None
+        if self.data_service is not None and getattr(self.data_service, "db", None) is not None:
+            db = self.data_service.db
+        else:
+            path = self.config.data.database_path or str(DATABASE_PATH)
+            db = DatabaseManager(db_path=Path(path))
+        validator = HistoryValidator(db, min_bars=max(50, int(self.config.data.min_bars) // 10))
+        report = validator.validate_all(
+            symbols=list(self.config.symbols),
+            timeframes=list(
+                dict.fromkeys(
+                    [self.config.primary_timeframe, *self.config.timeframes, *self.config.features.multi_timeframes]
+                )
+            ),
+        )
+        if not report.ok:
+            failed = [f"{s.canonical_symbol}:{s.timeframe}({s.status})" for s in report.series if not s.ok]
+            raise RuntimeError(
+                "History validation failed — refuse AI training on unvalidated data: "
+                + ", ".join(failed[:20])
+            )
+        return report
 
     def load_candles(
         self,

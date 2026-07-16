@@ -242,53 +242,37 @@ class AIMarketDataService:
             return {}, "none"
 
         try:
-            from collector.broker_sources.registry import (
-                BrokerSourceRegistry,
-                build_default_registry,
-                load_registry_from_config,
-            )
-            from collector.broker_sources.csv_source import CsvBrokerSource
-            from collector.multi_broker import MultiBrokerCollector
-            from database.migrations import apply_migrations
-            from database.schema import create_schema
-            from database.indexes import create_indexes
-            from database.seed import seed
+            from collector.history_engine import download_history
+            from datetime import datetime, timedelta
         except Exception as exc:
-            logger.warning("Broker collector unavailable: %s", exc)
+            logger.warning("History engine unavailable: %s", exc)
             return {}, "none"
 
-        create_schema(db)
-        seed(db)
-        apply_migrations(db)
-        create_indexes(db)
-
-        if dl.brokers_config:
-            registry = load_registry_from_config(dl.brokers_config)
-        else:
-            registry = build_default_registry(include_mt5=dl.include_mt5)
-        for name, path in (dl.csv_brokers or {}).items():
-            registry.register(CsvBrokerSource(name=name, data_dir=path))
-
-        if not registry.names():
+        end = datetime.utcnow()
+        start = end - timedelta(days=365 * max(1, int(years)))
+        try:
+            result = download_history(
+                db,
+                brokers="ALL",
+                markets="ALL" if not dl.currency_pairs_only else ["FOREX"],
+                symbols=list(symbols) if symbols else "ALL",
+                timeframes=list(timeframes),
+                start=start,
+                end=end,
+                resume=True,
+                brokers_config=dl.brokers_config,
+                include_mt5=dl.include_mt5,
+                csv_brokers=dl.csv_brokers or {},
+            )
+        except Exception as exc:
+            logger.warning("download_history failed: %s", exc)
             return {}, "none"
 
-        # Ensure requested symbols exist as markets for each connectable source
-        collector = MultiBrokerCollector(db, registry)
-        discovered = collector.discover_all(
-            currency_pairs_only=dl.currency_pairs_only,
-            source_names=None,
-        )
-        # For symbols the AI wants that weren't discovered, try alias resolution
-        # by creating markets pointing at canonical identity when a source has them.
-        self._ensure_requested_markets(collector, symbols, discovered)
-
-        inserted = collector.download_all(
-            list(timeframes),
-            currency_pairs_only=dl.currency_pairs_only,
-            years=years,
-        )
-        total = sum(int(v) for v in inserted.values())
-        if total <= 0 and not any(discovered.values()):
+        inserted = {}
+        for series in result.series:
+            inserted[series.broker] = inserted.get(series.broker, 0) + int(series.bars_inserted)
+        total = sum(inserted.values())
+        if total <= 0 and not result.series:
             return inserted, "none"
         return inserted, "broker"
 

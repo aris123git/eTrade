@@ -254,6 +254,7 @@ class DataDownloadConfig:
     years: int = 5
     currency_pairs_only: bool = False
     allow_synthetic_fallback: bool = True
+    require_validated: bool = False  # when True, train only on PASS series
     brokers_config: Optional[str] = None  # path to config/brokers.json
     csv_brokers: Dict[str, str] = field(default_factory=dict)  # name -> dir
     include_mt5: bool = True
