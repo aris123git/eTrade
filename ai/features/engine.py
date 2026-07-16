@@ -393,19 +393,19 @@ class FeatureEngine:
 
 
 def normalize_timestamp(value: Any) -> datetime:
-    """Normalize common timestamp representations into timezone-aware datetimes."""
+    """Normalize timestamps to naive UTC datetimes for repository alignment."""
 
     if isinstance(value, datetime):
-        return value if value.tzinfo is not None else value.replace(tzinfo=timezone.utc)
+        return value.replace(tzinfo=None) if value.tzinfo is not None else value
     if isinstance(value, np.datetime64):
         seconds = value.astype("datetime64[s]").astype(int)
-        return datetime.fromtimestamp(float(seconds), tz=timezone.utc)
+        return datetime.utcfromtimestamp(float(seconds))
     if isinstance(value, (int, float)):
-        return datetime.fromtimestamp(float(value), tz=timezone.utc)
+        return datetime.utcfromtimestamp(float(value))
     if isinstance(value, str):
         cleaned = value.replace("Z", "+00:00")
         parsed = datetime.fromisoformat(cleaned)
-        return parsed if parsed.tzinfo is not None else parsed.replace(tzinfo=timezone.utc)
+        return parsed.replace(tzinfo=None) if parsed.tzinfo is not None else parsed
     raise ValueError("Each candle must include a valid timestamp")
 
 

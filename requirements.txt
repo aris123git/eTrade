@@ -1,18 +1,12 @@
-# eTrade / MarketAI core
 numpy>=1.24
-# Optional but recommended for classical ML
 scikit-learn>=1.3
 joblib>=1.3
-# Optional boosting backends
-xgboost>=2.0
-lightgbm>=4.0
-catboost>=1.2
-# Optional deep learning
-torch>=2.0
-# Optional explainability / monitoring
-shap>=0.44
 psutil>=5.9
-# Optional experiment tooling
+lightgbm>=4.0
+xgboost>=2.0
+# Optional
+catboost>=1.2
+torch>=2.0
+shap>=0.44
 tensorboard>=2.14
-# Data / MT5 (platform)
 MetaTrader5>=5.0.45; platform_system=="Windows"
