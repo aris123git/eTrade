@@ -52,6 +52,7 @@ class AIPipeline:
 
     config: AIConfig = field(default_factory=AIConfig)
     candle_source: Any = None
+    data_service: Any = None
     feature_engine: FeatureEngine | None = None
     label_generator: LabelGenerator | None = None
     trainer: Trainer | None = None
@@ -66,6 +67,23 @@ class AIPipeline:
         self.trainer = self.trainer or Trainer(config=self.config)
         self.registry = self.registry or ModelRegistry(config=self.config)
         self.tracker = self.tracker or PerformanceTracker(config=self.config)
+        if self.data_service is None and self.config.data.auto_download:
+            from ai.data.auto_download import AIMarketDataService
+
+            self.data_service = AIMarketDataService(config=self.config)
+
+    def ensure_market_data(self, *, force: bool = False) -> Any:
+        """
+        Download every symbol × timeframe the AI needs.
+
+        Uses MT5 / CSV brokers when available; optional synthetic fallback
+        keeps offline training possible.
+        """
+        if self.data_service is None:
+            from ai.data.auto_download import AIMarketDataService
+
+            self.data_service = AIMarketDataService(config=self.config)
+        return self.data_service.ensure(force=force)
 
     def load_candles(
         self,
@@ -74,8 +92,17 @@ class AIPipeline:
         start: datetime | None = None,
         end: datetime | None = None,
         limit: int = 500,
+        *,
+        auto_download: bool | None = None,
     ) -> List[CandleDict]:
-        """Load candles from the injected source."""
+        """Load candles from the injected source, downloading first if needed."""
+
+        should_download = (
+            self.config.data.auto_download if auto_download is None else auto_download
+        )
+        if should_download:
+            self.ensure_market_data()
+            self._ensure_candle_source()
 
         if self.candle_source is None:
             raise RuntimeError("A candle_source is required to load candles")
@@ -287,10 +314,20 @@ class AIPipeline:
         register: bool = True,
         label_name: str | None = None,
         model_name: str | None = None,
+        auto_download: bool | None = None,
     ) -> PipelineRunResult:
         """Execute data -> features -> labels -> train -> evaluate -> register."""
 
-        active_candles = list(candles) if candles is not None else self.load_candles()
+        if candles is None:
+            active_candles = self.load_candles(auto_download=auto_download)
+        else:
+            # Still refresh coverage for multi-timeframe feature needs
+            should_download = (
+                self.config.data.auto_download if auto_download is None else auto_download
+            )
+            if should_download:
+                self.ensure_market_data()
+            active_candles = list(candles)
         dataset = self.build_dataset(active_candles, label_name=label_name)
         train_result = self.train(dataset.bundle)
         evaluation = self.evaluate(train_result.model, dataset.bundle)
@@ -307,12 +344,38 @@ class AIPipeline:
         candles: Sequence[CandleDict] | None = None,
         *,
         equity: float | None = None,
+        auto_download: bool | None = None,
     ) -> Dict[str, Any]:
         """Execute predict -> signal -> risk."""
 
+        if candles is None and (
+            self.config.data.auto_download if auto_download is None else auto_download
+        ):
+            self.ensure_market_data()
         prediction = self.predict(candles=candles)
         signal = self.create_signal(prediction)
         return {"prediction": prediction.to_dict(), "signal": self.apply_risk(signal, equity=equity)}
+
+    def _ensure_candle_source(self) -> None:
+        """Attach a DB-backed candle source after auto-download when none was injected."""
+        if self.candle_source is not None:
+            return
+        try:
+            from database.core.connection import DatabaseManager
+            from database.repositories.factory import create_repository_manager
+            from ai.data.candle_adapter import CandleRepositoryAdapter
+            from core.config import DATABASE_PATH
+            from pathlib import Path
+
+            path = self.config.data.database_path or str(DATABASE_PATH)
+            db = DatabaseManager(db_path=Path(path))
+            if self.data_service is not None and getattr(self.data_service, "db", None) is None:
+                self.data_service.db = db
+            repos = create_repository_manager(db)
+            self.candle_source = CandleRepositoryAdapter(repos.candles)
+        except Exception:
+            # Caller may still inject an in-memory source for tests
+            return
 
     def _metrics(self, model: BaseModel, X: NDArray[np.floating], y: NDArray[np.floating]) -> Dict[str, float]:
         return default_metrics(flatten_target(y), np.asarray(model.predict(X)), task=model.task)
@@ -393,10 +456,27 @@ class AIPipeline:
         return sorted(filtered or rows, key=lambda row: normalize_timestamp(row.get("timestamp")))
 
 
-def create_ai_pipeline(config: AIConfig | None = None, candle_source: Any = None) -> AIPipeline:
-    """Factory for the production AI pipeline."""
+def create_ai_pipeline(
+    config: AIConfig | None = None,
+    candle_source: Any = None,
+    *,
+    data_service: Any = None,
+    ensure_data: bool | None = None,
+) -> AIPipeline:
+    """
+    Factory for the production AI pipeline.
 
-    return AIPipeline(config=config or AIConfig(), candle_source=candle_source)
+    When ``data.auto_download`` is enabled (default), the pipeline downloads
+    all configured symbols × timeframes itself before the first load.
+    """
+
+    cfg = config or AIConfig()
+    pipeline = AIPipeline(config=cfg, candle_source=candle_source, data_service=data_service)
+    should_ensure = cfg.data.auto_download if ensure_data is None else ensure_data
+    if should_ensure:
+        pipeline.ensure_market_data()
+        pipeline._ensure_candle_source()
+    return pipeline
 
 
 def _is_number(value: Any) -> bool:

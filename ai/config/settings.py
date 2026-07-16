@@ -240,6 +240,29 @@ class StorageConfig:
     keep_last_n_versions: int = 20
 
 
+@dataclass
+class DataDownloadConfig:
+    """
+    AI-owned market-data acquisition.
+
+    When enabled, the pipeline downloads every configured symbol × timeframe
+    itself (MT5 brokers and/or CSV sources) before training or prediction.
+    """
+
+    auto_download: bool = True
+    min_bars: int = 2000
+    years: int = 5
+    currency_pairs_only: bool = False
+    allow_synthetic_fallback: bool = True
+    brokers_config: Optional[str] = None  # path to config/brokers.json
+    csv_brokers: Dict[str, str] = field(default_factory=dict)  # name -> dir
+    include_mt5: bool = True
+    include_multi_timeframes: bool = True
+    include_correlation_symbols: bool = True
+    refresh_interval_seconds: float = 3600.0
+    database_path: Optional[str] = None
+
+
 # ==============================================================================
 # ROOT CONFIG
 # ==============================================================================
@@ -268,6 +291,7 @@ class AIConfig:
     execution: ExecutionConfig = field(default_factory=ExecutionConfig)
     monitoring: MonitoringConfig = field(default_factory=MonitoringConfig)
     storage: StorageConfig = field(default_factory=StorageConfig)
+    data: DataDownloadConfig = field(default_factory=DataDownloadConfig)
     random_seed: int = 42
     timezone: str = "UTC"
 
@@ -311,6 +335,7 @@ class AIConfig:
             "execution": ExecutionConfig,
             "monitoring": MonitoringConfig,
             "storage": StorageConfig,
+            "data": DataDownloadConfig,
         }
         for key, conf_cls in nested_map.items():
             if key in payload and isinstance(payload[key], dict):

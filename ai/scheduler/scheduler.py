@@ -59,6 +59,35 @@ class AIScheduler:
     def add_monitor_job(self, func: JobCallable, interval_seconds: float, **kwargs: object) -> Job:
         return self.add_job("monitor", func, interval_seconds, **kwargs)
 
+    def add_data_download_job(
+        self,
+        pipeline: object,
+        interval_seconds: float | None = None,
+        *,
+        run_immediately: bool = True,
+    ) -> Job:
+        """
+        Periodically let the AI re-download all configured symbols × timeframes.
+        """
+
+        def _run() -> object:
+            ensure = getattr(pipeline, "ensure_market_data", None)
+            if ensure is None:
+                raise RuntimeError("pipeline does not expose ensure_market_data()")
+            return ensure(force=False)
+
+        seconds = interval_seconds
+        if seconds is None:
+            cfg = getattr(pipeline, "config", None)
+            data_cfg = getattr(cfg, "data", None) if cfg is not None else None
+            seconds = float(getattr(data_cfg, "refresh_interval_seconds", 3600.0) or 3600.0)
+        return self.add_job(
+            "data_download",
+            _run,
+            float(seconds),
+            run_immediately=run_immediately,
+        )
+
     def remove_job(self, job_id: str) -> bool:
         with self._lock:
             return self.jobs.pop(job_id, None) is not None
