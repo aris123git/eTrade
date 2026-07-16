@@ -138,16 +138,22 @@ class CandleRepository(BaseRepository[Candle]):
         
         data = self._entity_to_dict(candle)
         data.pop('candle_id', None)
+        if data.get('broker_id') is None:
+            data['broker_id'] = 0
         
         fields = list(data.keys())
         placeholders = ", ".join("?" for _ in fields)
         field_names = ", ".join(fields)
-        update_clause = ", ".join(f"{f} = excluded.{f}" for f in fields if f not in ['symbol', 'timeframe', 'timestamp'])
+        update_clause = ", ".join(
+            f"{f} = excluded.{f}"
+            for f in fields
+            if f not in ['broker_id', 'symbol', 'timeframe', 'timestamp']
+        )
         
         sql = f"""
             INSERT INTO {self.TABLE} ({field_names})
             VALUES ({placeholders})
-            ON CONFLICT(symbol, timeframe, timestamp) DO UPDATE SET {update_clause}
+            ON CONFLICT(broker_id, symbol, timeframe, timestamp) DO UPDATE SET {update_clause}
             RETURNING candle_id
         """
         
@@ -231,7 +237,8 @@ class CandleRepository(BaseRepository[Candle]):
                 'close': float(c.get('close', 0)),
                 'volume': float(c.get('volume', 0)),
                 'market_id': c.get('market_id'),
-                'broker_id': c.get('broker_id'),
+                # NULL broker_id breaks UNIQUE/ON CONFLICT matching in SQLite
+                'broker_id': c.get('broker_id') if c.get('broker_id') is not None else 0,
                 'spread': c.get('spread'),
                 'tick_volume': c.get('tick_volume'),
                 'status': c.get('status', CandleStatus.ACTIVE.value),
@@ -243,13 +250,16 @@ class CandleRepository(BaseRepository[Candle]):
         fields = list(data_list[0].keys())
         placeholders = ", ".join("?" for _ in fields)
         field_names = ", ".join(fields)
-        update_fields = [f for f in fields if f not in ['symbol', 'timeframe', 'timestamp'] and f != 'candle_uuid']
+        update_fields = [
+            f for f in fields
+            if f not in ['broker_id', 'symbol', 'timeframe', 'timestamp'] and f != 'candle_uuid'
+        ]
         update_clause = ", ".join(f"{f} = excluded.{f}" for f in update_fields)
         
         sql = f"""
             INSERT INTO {self.TABLE} ({field_names})
             VALUES ({placeholders})
-            ON CONFLICT(symbol, timeframe, timestamp) DO UPDATE SET {update_clause}
+            ON CONFLICT(broker_id, symbol, timeframe, timestamp) DO UPDATE SET {update_clause}
         """
         
         params = [tuple(d.values()) for d in data_list]
@@ -268,13 +278,16 @@ class CandleRepository(BaseRepository[Candle]):
                 fields = list(data.keys())
                 placeholders = ", ".join("?" for _ in fields)
                 field_names = ", ".join(fields)
-                update_fields = [f for f in fields if f not in ['symbol', 'timeframe', 'timestamp']]
+                update_fields = [
+                    f for f in fields
+                    if f not in ['broker_id', 'symbol', 'timeframe', 'timestamp']
+                ]
                 update_clause = ", ".join(f"{f} = excluded.{f}" for f in update_fields)
                 
                 sql = f"""
                     INSERT INTO {self.TABLE} ({field_names})
                     VALUES ({placeholders})
-                    ON CONFLICT(symbol, timeframe, timestamp) DO UPDATE SET {update_clause}
+                    ON CONFLICT(broker_id, symbol, timeframe, timestamp) DO UPDATE SET {update_clause}
                 """
                 
                 self.adapter.execute(sql, tuple(data.values()))

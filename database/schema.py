@@ -65,7 +65,8 @@ SCHEMA_SQL = [
     CREATE TABLE IF NOT EXISTS markets (
         market_id INTEGER PRIMARY KEY AUTOINCREMENT,
         broker_id INTEGER,
-        symbol TEXT UNIQUE NOT NULL,
+        symbol TEXT NOT NULL,
+        canonical_symbol TEXT,
         market_type TEXT,
         status TEXT DEFAULT 'active',
         description TEXT,
@@ -87,7 +88,22 @@ SCHEMA_SQL = [
         currency_base TEXT,
         currency_profit TEXT,
         currency_margin TEXT,
-        FOREIGN KEY(broker_id) REFERENCES brokers(broker_id)
+        FOREIGN KEY(broker_id) REFERENCES brokers(broker_id),
+        -- Same broker symbol may exist once per broker; cross-broker join uses canonical_symbol
+        UNIQUE(broker_id, symbol)
+    )
+    """,
+    """
+    CREATE TABLE IF NOT EXISTS symbol_aliases (
+        alias_id INTEGER PRIMARY KEY AUTOINCREMENT,
+        alias TEXT NOT NULL,
+        canonical_symbol TEXT NOT NULL,
+        asset_class TEXT,
+        description TEXT,
+        metadata TEXT DEFAULT '{}',
+        created_at TEXT,
+        updated_at TEXT,
+        UNIQUE(alias)
     )
     """,
     """
@@ -131,7 +147,8 @@ SCHEMA_SQL = [
         metadata TEXT DEFAULT '{}',
         created_at TEXT,
         updated_at TEXT,
-        UNIQUE(symbol, timeframe, timestamp)
+        -- Broker-scoped uniqueness: same symbol+time can exist for different brokers
+        UNIQUE(broker_id, symbol, timeframe, timestamp)
     )
     """,
     """
@@ -151,7 +168,7 @@ SCHEMA_SQL = [
         metadata TEXT DEFAULT '{}',
         created_at TEXT,
         updated_at TEXT,
-        UNIQUE(symbol, timestamp, bid, ask)
+        UNIQUE(broker_id, symbol, timestamp, bid, ask)
     )
     """,
     """

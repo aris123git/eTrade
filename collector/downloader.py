@@ -451,6 +451,12 @@ class DatabaseOperations:
         row = cursor.fetchone()
         return row[0] if row else None
 
+    def _resolve_broker_id(self, market_id: int) -> Optional[int]:
+        cursor = self.db.cursor()
+        cursor.execute("SELECT broker_id FROM markets WHERE market_id = ?", (market_id,))
+        row = cursor.fetchone()
+        return int(row[0]) if row and row[0] is not None else None
+
     def _resolve_timeframe_name(self, timeframe_id: int) -> Optional[str]:
         cursor = self.db.cursor()
         cursor.execute("SELECT name FROM timeframes WHERE timeframe_id = ?", (timeframe_id,))
@@ -468,6 +474,7 @@ class DatabaseOperations:
             return 0
         symbol = self._resolve_symbol(market_id)
         timeframe = self._resolve_timeframe_name(timeframe_id)
+        broker_id = self._resolve_broker_id(market_id)
         if not symbol or not timeframe:
             logger.error("Cannot insert candles: unresolved market/timeframe ids")
             return 0
@@ -487,8 +494,8 @@ class DatabaseOperations:
                     """
                     INSERT OR IGNORE INTO candles
                     (candle_uuid, symbol, timeframe, timestamp, open, high, low, close,
-                     volume, market_id, spread, tick_volume, status, metadata, created_at, updated_at)
-                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'active', '{}', ?, ?)
+                     volume, market_id, broker_id, spread, tick_volume, status, metadata, created_at, updated_at)
+                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'active', '{}', ?, ?)
                     """,
                     (
                         str(uuid4()),
@@ -501,6 +508,7 @@ class DatabaseOperations:
                         candle.close,
                         float(getattr(candle, "real_volume", 0) or getattr(candle, "tick_volume", 0) or 0),
                         market_id,
+                        broker_id,
                         getattr(candle, "spread", None),
                         getattr(candle, "tick_volume", None),
                         now,

@@ -68,7 +68,10 @@ class TickRepository(BaseRepository[Tick]):
             created_at=now,
             updated_at=now,
         )
-        tick_id = self.upsert(self._entity_to_dict(tick), ["symbol", "timestamp", "bid", "ask"])
+        data = self._entity_to_dict(tick)
+        if data.get("broker_id") is None:
+            data["broker_id"] = 0
+        tick_id = self.upsert(data, ["broker_id", "symbol", "timestamp", "bid", "ask"])
         tick.tick_id = int(tick_id) if tick_id is not None else None
         return tick
 
@@ -93,7 +96,7 @@ class TickRepository(BaseRepository[Tick]):
                         float(raw.get("volume", 0.0) or 0.0),
                         int(raw.get("flags", 0) or 0),
                         raw.get("market_id"),
-                        raw.get("broker_id"),
+                        raw.get("broker_id") if raw.get("broker_id") is not None else 0,
                         raw.get("status", TickStatus.ACTIVE.value),
                         json.dumps(raw.get("metadata") or {}),
                         now,
@@ -105,7 +108,7 @@ class TickRepository(BaseRepository[Tick]):
                     tick_uuid, symbol, timestamp, bid, ask, last, volume, flags,
                     market_id, broker_id, status, metadata, created_at, updated_at
                 ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-                ON CONFLICT(symbol, timestamp, bid, ask) DO UPDATE SET
+                ON CONFLICT(broker_id, symbol, timestamp, bid, ask) DO UPDATE SET
                     last=excluded.last,
                     volume=excluded.volume,
                     flags=excluded.flags,

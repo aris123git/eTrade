@@ -40,6 +40,7 @@ class Market:
     point: Optional[float] = None
     digits: Optional[int] = None
     contract_size: Optional[float] = None
+    canonical_symbol: Optional[str] = None
     metadata: Dict[str, Any] = field(default_factory=dict)
     created_at: Optional[datetime] = None
     updated_at: Optional[datetime] = None

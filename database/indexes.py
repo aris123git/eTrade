@@ -4,7 +4,10 @@ database/indexes.py - Index creation for MarketAI tables.
 
 from __future__ import annotations
 
+import logging
 from typing import Any
+
+logger = logging.getLogger(__name__)
 
 
 INDEX_SQL = [
@@ -12,11 +15,14 @@ INDEX_SQL = [
     "CREATE INDEX IF NOT EXISTS idx_currencies_status ON currencies(status)",
     "CREATE INDEX IF NOT EXISTS idx_timeframes_status ON timeframes(status)",
     "CREATE INDEX IF NOT EXISTS idx_markets_symbol ON markets(symbol)",
+    "CREATE INDEX IF NOT EXISTS idx_markets_canonical ON markets(canonical_symbol)",
     "CREATE INDEX IF NOT EXISTS idx_markets_status ON markets(status)",
     "CREATE INDEX IF NOT EXISTS idx_markets_active ON markets(active)",
     "CREATE INDEX IF NOT EXISTS idx_markets_broker ON markets(broker_id)",
+    "CREATE INDEX IF NOT EXISTS idx_symbol_aliases_canonical ON symbol_aliases(canonical_symbol)",
     "CREATE INDEX IF NOT EXISTS idx_symbols_name ON symbols(name)",
     "CREATE INDEX IF NOT EXISTS idx_candles_primary ON candles(symbol, timeframe, timestamp)",
+    "CREATE INDEX IF NOT EXISTS idx_candles_market_tf_ts ON candles(market_id, timeframe, timestamp)",
     "CREATE INDEX IF NOT EXISTS idx_candles_market ON candles(market_id)",
     "CREATE INDEX IF NOT EXISTS idx_candles_broker ON candles(broker_id)",
     "CREATE INDEX IF NOT EXISTS idx_candles_active ON candles(symbol, timeframe, timestamp) WHERE status = 'active'",
@@ -49,7 +55,11 @@ def _commit(db: Any) -> None:
 
 
 def create_indexes(db: Any) -> None:
-    """Create all performance indexes."""
+    """Create indexes; skip statements that fail on partially-migrated DBs."""
     for statement in INDEX_SQL:
-        _execute(db, statement)
+        try:
+            _execute(db, statement)
+        except Exception as exc:
+            # Legacy DB may not yet have canonical_symbol / symbol_aliases
+            logger.debug("Skipping index (%s): %s", statement, exc)
     _commit(db)
