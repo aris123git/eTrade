@@ -1,0 +1,117 @@
+MarketAI/
+
+├── core/                    # Shared infrastructure
+│   ├── config.py
+│   ├── logger.py
+│   ├── exceptions.py
+│   ├── events.py
+│   ├── utils.py
+│   └── constants.py
+│
+├── mt5/
+│   ├── manager.py
+│   ├── connection.py
+│   ├── broker.py
+│   ├── terminal.py
+│   └── adapter.py
+│
+├── discovery/
+│   ├── market_discovery.py
+│   ├── candle_discovery.py
+│   ├── currency_discovery.py
+│   ├── session_discovery.py
+│   ├── metadata_discovery.py
+│   └── dependency_discovery.py
+│
+├── collector/
+│   ├── downloader.py
+│   ├── updater.py
+│   ├── scheduler.py
+│   ├── symbol_manager.py
+│   └── queue.py
+│
+├── preprocessing/
+│   ├── cleaner.py
+│   ├── validator.py
+│   ├── merger.py
+│   ├── resampler.py
+│   ├── feature_builder.py
+│   └── normalizer.py
+│
+├── database/
+│   ├── database.py
+│   ├── repositories/
+    __init__.py
+    base_repository.py
+    repository_manager.py
+
+    market_repository.py
+    broker_repository.py
+    currency_repository.py
+    timeframe_repository.py
+
+    candle_repository.py
+    tick_repository.py
+    session_repository.py
+
+    metadata_repository.py
+
+    feature_repository.py
+
+    pattern_repository.py
+
+    prediction_repository.py
+
+    model_repository.py
+
+    learning_repository.py
+
+    graph_repository.py
+
+    statistics_repository.py
+
+    audit_repository.py
+│   ├── schema/
+
+│   ├── models/
+│   ├── indexes/
+│   ├── migrations/
+│   └── seed/
+│
+├── knowledge/
+│   ├── graph.py
+│   ├── pattern_engine.py
+│   ├── correlation_engine.py
+│   ├── clustering.py
+│   ├── feature_learning.py
+│   ├── statistics.py
+│   └── ontology.py
+│
+├── ai/
+│   ├── learning/
+│   ├── prediction/
+│   ├── reasoning/
+│   ├── memory/
+│   ├── reinforcement/
+│   ├── optimization/
+│   ├── planner/
+│   └── explainability/
+│
+├── validation/
+│   ├── live/
+│   ├── backtesting/
+│   ├── scorer.py
+│   ├── statistics.py
+│   └── benchmarking.py
+│
+├── api/
+│
+├── dashboard/
+│
+├── tests/
+│
+├── docs/
+│
+├── logs/
+│
+└── main.py
