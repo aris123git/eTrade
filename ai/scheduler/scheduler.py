@@ -88,6 +88,37 @@ class AIScheduler:
             run_immediately=run_immediately,
         )
 
+    def add_research_cycle_job(
+        self,
+        platform: object,
+        interval_seconds: float | None = None,
+        *,
+        run_immediately: bool = True,
+    ) -> Job:
+        """
+        Periodically run one Autonomous Quant Research cycle:
+
+        collect → validate → repair → learn → gate → backtest → paper → report
+        """
+
+        def _run() -> object:
+            run_cycle = getattr(platform, "run_cycle", None)
+            if run_cycle is None:
+                raise RuntimeError("platform does not expose run_cycle()")
+            report = run_cycle()
+            return report.to_dict() if hasattr(report, "to_dict") else report
+
+        seconds = interval_seconds
+        if seconds is None:
+            research = getattr(platform, "research", None)
+            seconds = float(getattr(research, "cycle_interval_seconds", 86_400.0) or 86_400.0)
+        return self.add_job(
+            "research_cycle",
+            _run,
+            float(seconds),
+            run_immediately=run_immediately,
+        )
+
     def remove_job(self, job_id: str) -> bool:
         with self._lock:
             return self.jobs.pop(job_id, None) is not None

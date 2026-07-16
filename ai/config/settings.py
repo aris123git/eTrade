@@ -264,6 +264,44 @@ class DataDownloadConfig:
     database_path: Optional[str] = None
 
 
+@dataclass
+class ResearchConfig:
+    """
+    Autonomous quant research loop.
+
+    Automates collect → validate → repair → learn → gate → backtest → paper →
+    report. Cannot invent market history that no source provides.
+    """
+
+    enabled: bool = True
+    cycle_interval_seconds: float = 86_400.0
+    sleep_seconds: float = 0.0
+    max_cycles: Optional[int] = None
+    markets: List[str] = field(
+        default_factory=lambda: ["FOREX", "METALS", "INDICES", "CRYPTO", "ENERGY"]
+    )
+    history_start: str = "2010-01-01"
+    repair_failed_series: bool = True
+    require_validated: bool = False
+    skip_collect: bool = False
+    model_candidates: List[str] = field(
+        default_factory=lambda: ["random_forest", "lightgbm", "xgboost"]
+    )
+    candle_limit: int = 5000
+    compare_models: bool = True
+    primary_metric: str = "test_f1"
+    metric_minimize: bool = False
+    min_improvement: float = 0.005
+    register_only_improvements: bool = True
+    run_backtest: bool = True
+    run_paper_trade: bool = True
+    paper_equity: float = 10_000.0
+    detect_drift: bool = True
+    generate_hypotheses: bool = True
+    reports_dir: str = "research_cycles"
+    state_filename: str = "research_state.json"
+
+
 # ==============================================================================
 # ROOT CONFIG
 # ==============================================================================
@@ -293,6 +331,7 @@ class AIConfig:
     monitoring: MonitoringConfig = field(default_factory=MonitoringConfig)
     storage: StorageConfig = field(default_factory=StorageConfig)
     data: DataDownloadConfig = field(default_factory=DataDownloadConfig)
+    research: ResearchConfig = field(default_factory=ResearchConfig)
     random_seed: int = 42
     timezone: str = "UTC"
 
@@ -337,6 +376,7 @@ class AIConfig:
             "monitoring": MonitoringConfig,
             "storage": StorageConfig,
             "data": DataDownloadConfig,
+            "research": ResearchConfig,
         }
         for key, conf_cls in nested_map.items():
             if key in payload and isinstance(payload[key], dict):
