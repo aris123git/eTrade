@@ -1,0 +1,75 @@
+"""ai/utils - Shared utilities for the AI engine."""
+
+from ai.utils.types import (
+    CandleDict,
+    FeatureMatrix,
+    LabelArray,
+    PredictionResult,
+    SignalType,
+    OrderSide,
+    OrderType,
+    PositionSide,
+)
+from ai.utils.math_ops import (
+    safe_div,
+    rolling_mean,
+    rolling_std,
+    rolling_min,
+    rolling_max,
+    ema,
+    sma,
+    true_range,
+    atr,
+    returns,
+    log_returns,
+    clip_array,
+    zscore,
+)
+from ai.utils.time_ops import (
+    timeframe_to_minutes,
+    align_timestamps,
+    session_from_hour,
+    is_weekend,
+)
+from ai.utils.validation import (
+    require_columns,
+    validate_finite,
+    ensure_2d,
+    ensure_1d,
+)
+from ai.utils.hashing import hash_dict, hash_array, content_hash
+
+__all__ = [
+    "CandleDict",
+    "FeatureMatrix",
+    "LabelArray",
+    "PredictionResult",
+    "SignalType",
+    "OrderSide",
+    "OrderType",
+    "PositionSide",
+    "safe_div",
+    "rolling_mean",
+    "rolling_std",
+    "rolling_min",
+    "rolling_max",
+    "ema",
+    "sma",
+    "true_range",
+    "atr",
+    "returns",
+    "log_returns",
+    "clip_array",
+    "zscore",
+    "timeframe_to_minutes",
+    "align_timestamps",
+    "session_from_hour",
+    "is_weekend",
+    "require_columns",
+    "validate_finite",
+    "ensure_2d",
+    "ensure_1d",
+    "hash_dict",
+    "hash_array",
+    "content_hash",
+]
