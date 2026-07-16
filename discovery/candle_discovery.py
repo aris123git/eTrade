@@ -1090,4 +1090,44 @@ class PatternManager:
         return result.get_patterns_by_direction(direction)
     
     def get_patterns_by_strength(self, result: PatternResult, min_strength: PatternStrength) -> List[DetectedPattern]:
-        """Filter patterns by minimum strength
+        """Filter patterns by minimum strength."""
+        patterns = getattr(result, 'patterns', None) or getattr(result, 'detected_patterns', None) or []
+
+        try:
+            min_value = float(min_strength.value)
+        except (AttributeError, TypeError, ValueError):
+            return list(patterns)
+
+        filtered = []
+        for pattern in patterns:
+            strength = getattr(pattern, 'strength', None)
+            try:
+                if float(strength.value) >= min_value:
+                    filtered.append(pattern)
+            except (AttributeError, TypeError, ValueError):
+                continue
+        return filtered
+
+    def get_strongest_patterns(self, result: PatternResult, limit: int = 5) -> List[DetectedPattern]:
+        """Get strongest patterns from a result."""
+        return result.get_strongest_patterns(limit)
+
+    def clear_cache(self) -> None:
+        """Clear cached pattern results."""
+        self._cache.clear()
+
+    def get_cache_stats(self) -> Dict[str, Any]:
+        """Get cache statistics."""
+        return {
+            'cache_size': len(self._cache),
+            'cached_keys': list(self._cache.keys()),
+        }
+
+
+# ==============================================================================
+# FACTORY
+# ==============================================================================
+
+def create_pattern_manager(config: Optional[Config] = None, min_confidence: float = 0.5) -> PatternManager:
+    """Create a PatternManager instance."""
+    return PatternManager(config=config, min_confidence=min_confidence)

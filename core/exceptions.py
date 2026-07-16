@@ -104,6 +104,9 @@ class MarketAIException(Exception):
         }
 
 
+MarketAIError = MarketAIException
+
+
 # ==============================================================================
 # CONFIGURATION ERRORS
 # ==============================================================================
@@ -240,6 +243,9 @@ class MT5ConnectionError(MT5Error):
             original_error=original_error,
             context={'message': message},
         )
+
+
+ConnectionError = MT5ConnectionError
 
 
 class MT5DisconnectedError(MT5Error):
