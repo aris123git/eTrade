@@ -40,6 +40,8 @@ class FeatureConfig:
             "structure",
             "session",
             "regime",
+            "microstructure",
+            "correlation",
         ]
     )
     sma_periods: List[int] = field(default_factory=lambda: [5, 10, 20, 50, 100, 200])
@@ -70,8 +72,14 @@ class FeatureConfig:
     swing_lookback: int = 20
     support_resistance_lookback: int = 50
     multi_timeframes: List[str] = field(default_factory=lambda: ["M15", "H1", "H4"])
-    correlation_symbols: List[str] = field(default_factory=list)
+    # Equity / bond / commodity / related-FX peers for cross-asset correlation.
+    # Include matching candles in FeatureEngine.transform(...) for these to fire.
+    correlation_symbols: List[str] = field(
+        default_factory=lambda: ["US30", "SPX500", "XAUUSD", "USOIL", "USDJPY", "US10Y"]
+    )
     correlation_window: int = 50
+    fx_vix_window: int = 20
+    fx_vix_lookback: int = 252
     dropna: bool = True
     fill_method: str = "ffill"
 

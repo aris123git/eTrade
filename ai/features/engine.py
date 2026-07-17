@@ -45,6 +45,7 @@ class FeatureGroup(str, Enum):
     STRUCTURE = "structure"
     SESSION = "session"
     REGIME = "regime"
+    MICROSTRUCTURE = "microstructure"
     MULTI_TIMEFRAME = "multi_timeframe"
     CORRELATION = "correlation"
 
@@ -263,7 +264,18 @@ class FeatureEngine:
         if self._enabled(enabled, FeatureGroup.SESSION):
             from ai.features.session import compute_session_features
 
-            feature_maps.append(("session", compute_session_features(arrays.timestamps)))
+            feature_maps.append(
+                (
+                    "session",
+                    compute_session_features(
+                        arrays.timestamps,
+                        open_=arrays.open,
+                        high=arrays.high,
+                        low=arrays.low,
+                        close=arrays.close,
+                    ),
+                )
+            )
 
         if self._enabled(enabled, FeatureGroup.REGIME):
             from ai.features.regime import compute_regime_features
@@ -275,6 +287,29 @@ class FeatureEngine:
                         arrays.high,
                         arrays.low,
                         arrays.close,
+                        rolling_windows=feature_config.rolling_windows,
+                        fx_vix_window=int(getattr(feature_config, "fx_vix_window", 20)),
+                        fx_vix_lookback=int(getattr(feature_config, "fx_vix_lookback", 252)),
+                    ),
+                )
+            )
+
+        if self._enabled(enabled, FeatureGroup.MICROSTRUCTURE):
+            from ai.features.microstructure import compute_microstructure_features
+
+            bid_vol, ask_vol = _extract_book_volumes(base_candles)
+            feature_maps.append(
+                (
+                    "microstructure",
+                    compute_microstructure_features(
+                        arrays.open,
+                        arrays.high,
+                        arrays.low,
+                        arrays.close,
+                        arrays.volume,
+                        arrays.spread,
+                        bid_volume=bid_vol,
+                        ask_volume=ask_vol,
                         rolling_windows=feature_config.rolling_windows,
                     ),
                 )
@@ -379,6 +414,8 @@ class FeatureEngine:
             if tf != base_timeframe
         }
         configured_peers = {symbol.upper() for symbol in config.features.correlation_symbols}
+        # When correlation is enabled with an empty peer list, accept any other
+        # symbols present in the candle batch (caller-supplied cross-asset pack).
         peer_symbols = {
             symbol: sorted(rows, key=lambda c: normalize_timestamp(c.get("timestamp")))
             for symbol, rows in by_symbol.items()
@@ -523,6 +560,34 @@ def _first_float(candle: Mapping[str, Any], keys: Sequence[str], default: float)
         if value is not None:
             return float(value)
     return default
+
+
+def _extract_book_volumes(
+    candles: Sequence[CandleDict],
+) -> tuple[NDArray[np.floating] | None, NDArray[np.floating] | None]:
+    """Pull optional bid/ask volumes from candle fields or metadata."""
+
+    if not candles:
+        return None, None
+    bids: list[float] = []
+    asks: list[float] = []
+    any_book = False
+    for candle in candles:
+        meta = candle.get("metadata") if isinstance(candle, Mapping) else None
+        meta = meta if isinstance(meta, Mapping) else {}
+        bid = _first_float(candle, ("bid_volume", "bid_vol", "buy_volume"), np.nan)
+        ask = _first_float(candle, ("ask_volume", "ask_vol", "sell_volume"), np.nan)
+        if not np.isfinite(bid):
+            bid = _first_float(meta, ("bid_volume", "bid_vol", "buy_volume"), np.nan)
+        if not np.isfinite(ask):
+            ask = _first_float(meta, ("ask_volume", "ask_vol", "sell_volume"), np.nan)
+        if np.isfinite(bid) or np.isfinite(ask):
+            any_book = True
+        bids.append(float(bid) if np.isfinite(bid) else np.nan)
+        asks.append(float(ask) if np.isfinite(ask) else np.nan)
+    if not any_book:
+        return None, None
+    return np.asarray(bids, dtype=float), np.asarray(asks, dtype=float)
 
 
 def _forward_fill(matrix: NDArray[np.floating]) -> NDArray[np.floating]:

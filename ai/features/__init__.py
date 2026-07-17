@@ -9,7 +9,15 @@ VERSION: 1.0.0
 """
 
 from ai.features.candle_structure import CandleDirection, compute_candle_structure_features
-from ai.features.correlation import CorrelationMeasure, CorrelationSpec, compute_correlation_features
+from ai.features.correlation import (
+    ASSET_CLASS_BY_SYMBOL,
+    DEFAULT_CROSS_ASSET_SYMBOLS,
+    AssetClass,
+    CorrelationMeasure,
+    CorrelationSpec,
+    asset_class_for,
+    compute_correlation_features,
+)
 from ai.features.engine import (
     CandleArrays,
     FeatureFrame,
@@ -21,6 +29,7 @@ from ai.features.engine import (
     candles_to_arrays,
     create_feature_engine,
 )
+from ai.features.microstructure import MicrostructureSignal, compute_microstructure_features
 from ai.features.momentum import MomentumIndicator, compute_momentum_features
 from ai.features.moving_averages import MovingAverageKind, compute_moving_average_features
 from ai.features.multi_timeframe import AlignmentMode, TimeframeFeatureSpec, compute_multi_timeframe_features
@@ -33,16 +42,20 @@ from ai.features.volatility import VolatilityIndicator, compute_volatility_featu
 from ai.features.volume import VolumeIndicator, compute_volume_features
 
 __all__ = [
+    "ASSET_CLASS_BY_SYMBOL",
     "AlignmentMode",
+    "AssetClass",
     "CandleArrays",
     "CandleDirection",
     "CorrelationMeasure",
     "CorrelationSpec",
+    "DEFAULT_CROSS_ASSET_SYMBOLS",
     "FeatureEngine",
     "FeatureFrame",
     "FeatureGroup",
     "FeatureMap",
     "MarketRegime",
+    "MicrostructureSignal",
     "MomentumIndicator",
     "MovingAverageKind",
     "PatternKind",
@@ -54,9 +67,11 @@ __all__ = [
     "VolumeIndicator",
     "apply_nan_policy",
     "assemble_feature_matrix",
+    "asset_class_for",
     "candles_to_arrays",
     "compute_candle_structure_features",
     "compute_correlation_features",
+    "compute_microstructure_features",
     "compute_momentum_features",
     "compute_moving_average_features",
     "compute_multi_timeframe_features",

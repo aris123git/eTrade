@@ -3,16 +3,17 @@ ai/features/correlation.py - Cross-asset correlation features
 
 RESPONSIBILITY:
 Align peer-symbol candles to base rows and compute rolling correlation, beta,
-relative return, and spread features.
+relative return, and spread features. Peers are tagged by asset class
+(equity / bond / commodity / fx) so models can see cross-asset risk transmission.
 
-VERSION: 1.0.0
+VERSION: 1.1.0
 """
 
 from __future__ import annotations
 
 from dataclasses import dataclass
 from enum import Enum
-from typing import Dict, Mapping, Sequence
+from typing import Dict, List, Mapping, Sequence
 
 import numpy as np
 from numpy.typing import NDArray
@@ -39,6 +40,49 @@ class CorrelationMeasure(str, Enum):
     RELATIVE_RETURN = "relative_return"
 
 
+class AssetClass(str, Enum):
+    EQUITY = "equity"
+    BOND = "bond"
+    COMMODITY = "commodity"
+    FX = "fx"
+    OTHER = "other"
+
+
+# Default peers for FX strategies (equity / bond / commodity / related FX).
+DEFAULT_CROSS_ASSET_SYMBOLS: List[str] = [
+    "US30",
+    "SPX500",
+    "XAUUSD",
+    "USOIL",
+    "USDJPY",
+    "US10Y",
+]
+
+ASSET_CLASS_BY_SYMBOL: Dict[str, str] = {
+    "US30": AssetClass.EQUITY.value,
+    "DJ30": AssetClass.EQUITY.value,
+    "SPX500": AssetClass.EQUITY.value,
+    "NAS100": AssetClass.EQUITY.value,
+    "GER40": AssetClass.EQUITY.value,
+    "UK100": AssetClass.EQUITY.value,
+    "US10Y": AssetClass.BOND.value,
+    "USTBOND": AssetClass.BOND.value,
+    "BUND": AssetClass.BOND.value,
+    "XAUUSD": AssetClass.COMMODITY.value,
+    "XAGUSD": AssetClass.COMMODITY.value,
+    "USOIL": AssetClass.COMMODITY.value,
+    "UKOIL": AssetClass.COMMODITY.value,
+    "COPPER": AssetClass.COMMODITY.value,
+    "EURUSD": AssetClass.FX.value,
+    "GBPUSD": AssetClass.FX.value,
+    "USDJPY": AssetClass.FX.value,
+    "AUDUSD": AssetClass.FX.value,
+    "USDCAD": AssetClass.FX.value,
+    "USDCHF": AssetClass.FX.value,
+    "NZDUSD": AssetClass.FX.value,
+}
+
+
 @dataclass(frozen=True)
 class CorrelationSpec:
     """Rolling correlation settings."""
@@ -49,6 +93,11 @@ class CorrelationSpec:
 # ==============================================================================
 # PUBLIC API
 # ==============================================================================
+
+
+def asset_class_for(symbol: str) -> str:
+    key = str(symbol).upper().split(".")[0]
+    return ASSET_CLASS_BY_SYMBOL.get(key, AssetClass.OTHER.value)
 
 
 def compute_correlation_features(
@@ -63,6 +112,12 @@ def compute_correlation_features(
     base_returns = _returns(base.close, 1)
     features: FeatureMap = {}
     spec = CorrelationSpec(window=max(int(window), 2))
+    class_corrs: Dict[str, List[NDArray[np.floating]]] = {
+        AssetClass.EQUITY.value: [],
+        AssetClass.BOND.value: [],
+        AssetClass.COMMODITY.value: [],
+        AssetClass.FX.value: [],
+    }
 
     for symbol, candles in sorted(peer_symbols.items()):
         if not candles:
@@ -80,6 +135,39 @@ def compute_correlation_features(
         features[f"{prefix}_beta_{spec.window}"] = beta
         features[f"{prefix}_relative_return"] = relative_return
         features[f"{prefix}_spread_zscore_{spec.window}"] = spread
+        asset_class = asset_class_for(symbol)
+        features[f"{prefix}_asset_class_{asset_class}"] = np.ones(len(base_returns), dtype=float)
+        if asset_class in class_corrs:
+            class_corrs[asset_class].append(correlation)
+
+    # Aggregate correlation to each asset class (mean across peers in that class).
+    n = len(base_returns)
+    for asset_class, series_list in class_corrs.items():
+        if not series_list:
+            features[f"corr_class_{asset_class}_{spec.window}"] = np.full(n, np.nan, dtype=float)
+            features[f"corr_class_{asset_class}_abs_{spec.window}"] = np.full(n, np.nan, dtype=float)
+            continue
+        stacked = np.vstack(series_list)
+        mean_corr = np.full(n, np.nan, dtype=float)
+        mean_abs = np.full(n, np.nan, dtype=float)
+        finite_mask = np.isfinite(stacked)
+        counts = np.sum(finite_mask, axis=0)
+        filled = np.where(finite_mask, stacked, 0.0)
+        abs_filled = np.where(finite_mask, np.abs(stacked), 0.0)
+        valid = counts > 0
+        mean_corr[valid] = np.sum(filled, axis=0)[valid] / counts[valid]
+        mean_abs[valid] = np.sum(abs_filled, axis=0)[valid] / counts[valid]
+        features[f"corr_class_{asset_class}_{spec.window}"] = mean_corr
+        features[f"corr_class_{asset_class}_abs_{spec.window}"] = mean_abs
+
+    # Risk-on / risk-off proxy: equity corr high & gold corr negative ⇒ risk-on
+    equity = features.get(f"corr_class_equity_{spec.window}")
+    commodity = features.get(f"corr_class_commodity_{spec.window}")
+    if equity is not None and commodity is not None:
+        features["corr_risk_on_proxy"] = np.asarray(equity, dtype=float) - np.asarray(commodity, dtype=float)
+    else:
+        features["corr_risk_on_proxy"] = np.full(n, np.nan, dtype=float)
+
     return features
 
 
