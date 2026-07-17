@@ -3,6 +3,7 @@ ai/research - Autonomous Quantitative Research Engine (Phase 4).
 """
 
 from ai.research.autonomous_scheduler import AutonomousScheduler, SchedulePlan
+from ai.research.component_verification import ComponentVerifier, VerificationReport, verify_components
 from ai.research.config import ResearchConfig
 from ai.research.discovery import FeatureHypothesis, HypothesisDiscoveryEngine
 from ai.research.edge_proof import EdgeEvidence, EdgeProofEngine, create_edge_proof_engine
@@ -18,6 +19,9 @@ from ai.research.validation_gate import StrictValidationGate
 __all__ = [
     "AutonomousScheduler",
     "SchedulePlan",
+    "ComponentVerifier",
+    "VerificationReport",
+    "verify_components",
     "ResearchConfig",
     "FeatureHypothesis",
     "HypothesisDiscoveryEngine",

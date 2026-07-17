@@ -1,31 +1,25 @@
 #!/usr/bin/env python3
 """
-scripts/prove_edge.py — Evidence-first entry point for eTrade
+scripts/validate_and_research.py — Complete validation + autonomous edge research
 
-Objective: prove whether eTrade has a real statistical edge.
+No new models. No new indicators.
 
-Daily routine (no architecture expansion):
-  1. Download every candle/tick the broker allows
-  2. Repair gaps
-  3. Train / validate / reject weak models
-  4. Paper trade
-  5. Store results into the research DB + edge_evidence.json
-  6. Sleep until the next run
+Mission:
+  1) Continuously verify every platform component
+  2) Download / repair real market history
+  3) Train, validate, reject weak models
+  4) Paper trade
+  5) Accumulate honest edge evidence
 
 Usage:
-  # One evidence day (Windows + MT5 recommended)
-  python3 scripts/prove_edge.py --once \\
-      --symbols EURUSD,XAUUSD,GBPUSD,USDJPY \\
-      --timeframes M1,M5,M15,H1,H4,D1
+  # Verify components only
+  python3 scripts/validate_and_research.py --verify-only
 
-  # Continuous (resume tomorrow from the same DB)
-  python3 scripts/prove_edge.py --forever --interval 86400
+  # One full evidence day (verify → download → train → paper → store)
+  python3 scripts/validate_and_research.py --once
 
-  # CSV broker archives (no MT5)
-  python3 scripts/prove_edge.py --once --no-mt5 \\
-      --csv-broker Export=/path/to/ohlcv
-
-Never invents bars. Never enables live trading.
+  # Continuous autonomous research
+  python3 scripts/validate_and_research.py --forever --interval 86400
 """
 
 from __future__ import annotations
@@ -41,6 +35,7 @@ if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
 from ai.config.settings import AIConfig, ResearchConfig
+from ai.research.component_verification import verify_components
 from ai.research.edge_proof import create_edge_proof_engine
 from ai.research.platform import create_research_platform
 from database.core.connection import DatabaseManager
@@ -55,13 +50,13 @@ DEFAULT_TIMEFRAMES = "M1,M5,M15,H1,H4,D1"
 
 
 def _parse_args() -> argparse.Namespace:
-    p = argparse.ArgumentParser(description="Prove whether eTrade has a real edge")
+    p = argparse.ArgumentParser(description="Validate components and prove statistical edge")
     mode = p.add_mutually_exclusive_group()
-    mode.add_argument("--once", action="store_true", help="Run one evidence day (default)")
-    mode.add_argument("--forever", action="store_true", help="Loop daily until stopped")
-    mode.add_argument("--verify-only", action="store_true", help="Verify every component, then exit")
-    p.add_argument("--days", type=int, default=None, help="Max days with --forever")
-    p.add_argument("--interval", type=float, default=86400.0, help="Seconds between days")
+    mode.add_argument("--verify-only", action="store_true", help="Component verification only")
+    mode.add_argument("--once", action="store_true", help="One evidence day (default)")
+    mode.add_argument("--forever", action="store_true", help="Loop forever")
+    p.add_argument("--days", type=int, default=None)
+    p.add_argument("--interval", type=float, default=86400.0)
     p.add_argument("--symbols", type=str, default=DEFAULT_SYMBOLS)
     p.add_argument("--timeframes", type=str, default=DEFAULT_TIMEFRAMES)
     p.add_argument("--models", type=str, default="random_forest,lightgbm,xgboost")
@@ -70,20 +65,14 @@ def _parse_args() -> argparse.Namespace:
     p.add_argument("--candle-limit", type=int, default=20000)
     p.add_argument("--db", type=str, default=None)
     p.add_argument("--artifacts", type=str, default="ai_artifacts/edge_proof")
-    p.add_argument("--csv-broker", action="append", default=[], help="name=dir")
+    p.add_argument("--csv-broker", action="append", default=[])
     p.add_argument("--no-mt5", action="store_true")
     p.add_argument("--no-ticks", action="store_true")
     p.add_argument("--verbose", action="store_true")
     return p.parse_args()
 
 
-def main() -> int:
-    args = _parse_args()
-    logging.basicConfig(
-        level=logging.DEBUG if args.verbose else logging.INFO,
-        format="%(asctime)s %(levelname)s %(name)s: %(message)s",
-    )
-
+def _build_platform(args: argparse.Namespace):
     symbols = [s.strip().upper() for s in args.symbols.split(",") if s.strip()]
     timeframes = [t.strip().upper() for t in args.timeframes.split(",") if t.strip()]
     models = [m.strip() for m in args.models.split(",") if m.strip()]
@@ -140,47 +129,73 @@ def main() -> int:
         db=db,
         artifact_root=artifact_root,
     )
-    engine = create_edge_proof_engine(platform)
+    return platform, db, artifact_root
+
+
+def main() -> int:
+    args = _parse_args()
+    logging.basicConfig(
+        level=logging.DEBUG if args.verbose else logging.INFO,
+        format="%(asctime)s %(levelname)s %(name)s: %(message)s",
+    )
 
     print()
     print("=" * 64)
-    print("eTrade Edge Proof Mode")
+    print("eTrade Validation + Autonomous Research")
     print("=" * 64)
-    print("Objective: prove a real statistical edge on real market data.")
-    print("Loop: verify → download → repair → train → validate → paper → store → sleep")
-    print("Live trading: DISABLED")
-    print(f"symbols={len(symbols)} timeframes={timeframes}")
-    print(f"db={db_path}")
+    print("No new models. No new indicators.")
+    print("Verify components → download → train → validate → paper → evidence")
+    print()
+
+    platform, db, artifact_root = _build_platform(args)
+
+    if args.verify_only:
+        report = verify_components(db=db, config=platform.config)
+        report.print_summary()
+        out = artifact_root / "component_verification_latest.json"
+        out.write_text(json.dumps(report.to_dict(), indent=2, default=str), encoding="utf-8")
+        print(f"wrote {out}")
+        return 0 if report.critical_ok else 1
+
+    engine = create_edge_proof_engine(platform)
+    print(f"db={platform.config.data.database_path}")
     print(f"evidence={engine.evidence_path}")
     print()
 
-    if args.verify_only:
-        report = engine.verify_components()
-        print(json.dumps(report, indent=2, default=str)[:6000])
-        return 0 if report.get("critical_ok") else 1
-
     if args.forever:
         evidence = engine.run_forever(max_days=args.days, sleep_seconds=float(args.interval))
-        print(json.dumps(evidence.to_dict(), indent=2, default=str)[:4000])
-        return 0 if evidence.scientific_claim_allowed else 2
+        print(json.dumps(evidence.to_dict(), indent=2, default=str)[:5000])
+        return 0 if evidence.components_ok else 1
 
     result = engine.run_day()
     evidence = result["evidence"]
-    print(json.dumps({
-        "runs_completed": evidence["runs_completed"],
-        "scientific_claim_allowed": evidence["scientific_claim_allowed"],
-        "edge_demonstrated": evidence["edge_demonstrated"],
-        "reason": evidence["reason"],
-        "archive": {
-            "candles": (evidence.get("archive") or {}).get("candles"),
-            "ticks": (evidence.get("archive") or {}).get("ticks"),
-            "symbols": (evidence.get("archive") or {}).get("symbols"),
-        },
-        "experiments": evidence.get("experiments"),
-        "evidence_path": str(engine.evidence_path),
-    }, indent=2, default=str))
-
-    # Exit 0 = day ran; 2 = no scientific claim yet (expected early on)
+    components = (result.get("day") or {}).get("components") or evidence.get("components") or {}
+    if components:
+        print(
+            f"components: critical_ok={components.get('critical_ok')} "
+            f"passed={components.get('passed')} failed={components.get('failed')}"
+        )
+    print(
+        json.dumps(
+            {
+                "runs_completed": evidence["runs_completed"],
+                "components_ok": evidence.get("components_ok"),
+                "scientific_claim_allowed": evidence["scientific_claim_allowed"],
+                "edge_demonstrated": evidence["edge_demonstrated"],
+                "reason": evidence["reason"],
+                "archive": {
+                    "candles": (evidence.get("archive") or {}).get("candles"),
+                    "ticks": (evidence.get("archive") or {}).get("ticks"),
+                },
+                "experiments": evidence.get("experiments"),
+                "evidence_path": str(engine.evidence_path),
+            },
+            indent=2,
+            default=str,
+        )
+    )
+    if result.get("day", {}).get("aborted"):
+        return 1
     return 0
 
 

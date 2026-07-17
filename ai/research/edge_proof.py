@@ -38,6 +38,8 @@ class EdgeEvidence:
     scientific_claim_allowed: bool = False
     edge_demonstrated: bool = False
     reason: str = "insufficient_evidence"
+    components_ok: bool = False
+    components: Dict[str, Any] = field(default_factory=dict)
     archive: Dict[str, Any] = field(default_factory=dict)
     experiments: Dict[str, Any] = field(default_factory=dict)
     paper: Dict[str, Any] = field(default_factory=dict)
@@ -93,14 +95,49 @@ class EdgeProofEngine:
         self.evidence_path = Path(evidence_path) if evidence_path else root / "edge_evidence.json"
         self.evidence = self._load()
 
+    def verify_components(self) -> Dict[str, Any]:
+        """Verify every subsystem before / during evidence collection."""
+        from ai.research.component_verification import verify_components
+
+        report = verify_components(db=self.platform.db, config=self.platform.config)
+        path = Path(self.platform.artifact_root) / "component_verification_latest.json"
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_text(json.dumps(report.to_dict(), indent=2, default=str), encoding="utf-8")
+        # Persist into research validations for audit
+        try:
+            self.platform.research_repo.record_validation(
+                experiment_id=None,
+                model_id=None,
+                stage="component_verification",
+                passed=report.critical_ok,
+                metrics={"passed": report.passed, "failed": report.failed, "skipped": report.skipped},
+                details=report.to_dict(),
+            )
+        except Exception as exc:
+            logger.warning("could not persist component verification: %s", exc)
+        return report.to_dict()
+
     def run_day(self) -> Dict[str, Any]:
         """
         One evidence day:
 
-          download → repair → ticks → train/validate → paper → store
+          verify components → download → repair → ticks → train/validate → paper → store
         """
         started = utc_now_iso()
         logger.info("edge-proof day start")
+
+        components = self.verify_components()
+        if not components.get("critical_ok"):
+            day = {
+                "started_at": started,
+                "finished_at": utc_now_iso(),
+                "components": components,
+                "aborted": True,
+                "reason": "critical_component_verification_failed",
+            }
+            self._update_evidence(day)
+            logger.error("edge-proof aborted: critical component verification failed")
+            return {"day": day, "evidence": self.evidence.to_dict()}
 
         # Maximise archive growth
         collect = self.platform._stage_collect()
@@ -120,6 +157,7 @@ class EdgeProofEngine:
         day = {
             "started_at": started,
             "finished_at": utc_now_iso(),
+            "components": components,
             "collect": collect,
             "validate": validate,
             "repair": repair,
@@ -210,11 +248,26 @@ class EdgeProofEngine:
                 missing.append("synthetic_not_allowed_for_claims")
             reason = "insufficient_evidence:" + ",".join(missing)
 
+        components = day.get("components") or {}
+        # Abort days never allow scientific claims
+        if day.get("aborted"):
+            claim_allowed = False
+            edge = False
+            reason = str(day.get("reason") or "aborted")
+
         self.evidence.updated_at = utc_now_iso()
         self.evidence.runs_completed += 1
         self.evidence.scientific_claim_allowed = claim_allowed
         self.evidence.edge_demonstrated = edge
         self.evidence.reason = reason
+        self.evidence.components_ok = bool(components.get("critical_ok"))
+        self.evidence.components = {
+            "ok": components.get("ok"),
+            "critical_ok": components.get("critical_ok"),
+            "passed": components.get("passed"),
+            "failed": components.get("failed"),
+            "finished_at": components.get("finished_at"),
+        }
         self.evidence.archive = archive
         self.evidence.experiments = {
             "experiments": exp_count,
@@ -234,6 +287,7 @@ class EdgeProofEngine:
         self.evidence.history.append(
             {
                 "finished_at": day.get("finished_at"),
+                "components_ok": bool(components.get("critical_ok")),
                 "bars_inserted": (day.get("collect") or {}).get("bars_inserted"),
                 "ticks_inserted": (day.get("ticks") or {}).get("ticks_inserted"),
                 "claim_allowed": claim_allowed,
@@ -289,6 +343,8 @@ class EdgeProofEngine:
                 scientific_claim_allowed=bool(data.get("scientific_claim_allowed")),
                 edge_demonstrated=bool(data.get("edge_demonstrated")),
                 reason=str(data.get("reason") or ""),
+                components_ok=bool(data.get("components_ok")),
+                components=dict(data.get("components") or {}),
                 archive=dict(data.get("archive") or {}),
                 experiments=dict(data.get("experiments") or {}),
                 paper=dict(data.get("paper") or {}),
