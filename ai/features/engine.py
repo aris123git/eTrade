@@ -398,14 +398,30 @@ class FeatureEngine:
         else:
             base_candidates = list(candles)
 
-        base_symbol = str(base_candidates[0].get("symbol", config.symbols[0] if config.symbols else "")).upper()
+        # Prefer configured primary symbol so mixed peer batches stay correct.
+        base_symbol = (
+            str(config.symbols[0]).upper()
+            if config.symbols
+            else str(base_candidates[0].get("symbol", "")).upper()
+        )
         base_timeframe = str(base_candidates[0].get("timeframe", primary_tf)).upper()
-        base_candles = [
+        # If peers share the primary timeframe, keep only the primary symbol as base.
+        symbol_matched = [
             c
             for c in base_candidates
             if str(c.get("symbol", base_symbol)).upper() == base_symbol
             and str(c.get("timeframe", base_timeframe)).upper() == base_timeframe
         ]
+        if symbol_matched:
+            base_candles = symbol_matched
+            base_timeframe = str(base_candles[0].get("timeframe", primary_tf)).upper()
+        else:
+            base_candles = [
+                c
+                for c in base_candidates
+                if str(c.get("symbol", base_symbol)).upper() == base_symbol
+                and str(c.get("timeframe", base_timeframe)).upper() == base_timeframe
+            ]
         base_candles = sorted(base_candles, key=lambda c: normalize_timestamp(c.get("timestamp")))
 
         higher_timeframes = {

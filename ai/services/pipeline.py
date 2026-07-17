@@ -171,11 +171,13 @@ class AIPipeline:
     def build_dataset(self, candles: Sequence[CandleDict], label_name: str | None = None) -> PipelineDataset:
         """Build an aligned DatasetBundle for supervised training."""
 
+        # Full candle batch keeps correlation / multi-TF peers for FeatureEngine;
+        # labels still resolve against primary-symbol base bars only.
         base_candles = self._base_candles(candles)
-        features = self.build_features(base_candles)
-        labels = self.build_labels(base_candles)
+        features = self.build_features(candles)
+        labels = self.build_labels(candles)
         label = self._select_label(labels, label_name)
-        X, y, timestamps = self._align_features_labels(features, label, base_candles)
+        X, y, timestamps = self._align_features_labels(features, label, candles)
         if len(X) == 0:
             raise ValueError("No valid aligned feature/label rows were produced")
         train_end, val_end = self._split_points(len(X))
@@ -479,7 +481,12 @@ class AIPipeline:
         if not rows:
             return []
         primary_tf = self.config.primary_timeframe.upper()
-        symbol = str(rows[0].get("symbol", self.config.symbols[0] if self.config.symbols else "")).upper()
+        # Prefer configured primary symbol so peer candles can precede the pack.
+        symbol = (
+            str(self.config.symbols[0]).upper()
+            if self.config.symbols
+            else str(rows[0].get("symbol", "")).upper()
+        )
         filtered = [
             row
             for row in rows

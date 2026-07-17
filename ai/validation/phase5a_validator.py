@@ -31,6 +31,11 @@ YAHOO_SYMBOLS: Dict[str, str] = {
     "GBPUSD": "GBPUSD=X",
     "USDJPY": "JPY=X",
     "XAUUSD": "GC=F",
+    # Cross-asset peers used by correlation / Phase 5b feature packs
+    "US30": "^DJI",
+    "SPX500": "^GSPC",
+    "USOIL": "CL=F",
+    "US10Y": "^TNX",
 }
 
 PIP_SIZE: Dict[str, float] = {
@@ -559,6 +564,40 @@ class OverfitDetector:
         return max(0.0, min(1.0, decay))
 
 
+# Feature groups Phase 5b explicitly enables (advanced + supporting baseline groups).
+PHASE5B_FEATURE_GROUPS: Tuple[str, ...] = (
+    "price",
+    "returns",
+    "moving_averages",
+    "momentum",
+    "volatility",
+    "channels",
+    "volume",
+    "candle_structure",
+    "patterns",
+    "structure",
+    "session",
+    "regime",
+    "microstructure",
+    "correlation",
+)
+PHASE5B_ADVANCED_GROUPS: Tuple[str, ...] = (
+    "microstructure",
+    "regime",
+    "correlation",
+    "session",
+    "volatility",
+)
+DEFAULT_PEER_SYMBOLS: Tuple[str, ...] = (
+    "US30",
+    "SPX500",
+    "XAUUSD",
+    "USOIL",
+    "USDJPY",
+    "US10Y",
+)
+
+
 @dataclass
 class WalkForwardBacktester:
     """Walk-forward train → OOS paper trade → metrics, with no future peeking."""
@@ -573,6 +612,10 @@ class WalkForwardBacktester:
     initial_equity: float = 100_000.0
     artifact_dir: Path = field(default_factory=lambda: Path("ai/artifacts/phase5a"))
     random_seed: int = 42
+    # Phase 5b: keep advanced feature groups + inject cross-asset peer candles.
+    enable_advanced_features: bool = False
+    peer_symbols: Sequence[str] = field(default_factory=lambda: list(DEFAULT_PEER_SYMBOLS))
+    feature_groups: Sequence[str] = field(default_factory=lambda: list(PHASE5B_FEATURE_GROUPS))
 
     def __post_init__(self) -> None:
         from ai.config.settings import AIConfig
@@ -587,6 +630,8 @@ class WalkForwardBacktester:
         self.loader = self.loader or HistoricalDataLoader(random_seed=self.random_seed)
         self.artifact_dir = Path(self.artifact_dir)
         self.artifact_dir.mkdir(parents=True, exist_ok=True)
+        self.peer_symbols = [str(s).upper() for s in self.peer_symbols]
+        self.feature_groups = [str(g).lower() for g in self.feature_groups]
         random.seed(self.random_seed)
         np.random.seed(self.random_seed)
 
@@ -657,6 +702,7 @@ class WalkForwardBacktester:
                 logger.warning("confirm TF %s unavailable: %s", tf, exc)
 
         candles = self.loader.candles_from_frame(primary_df, symbol, primary)
+        peer_candles = self._load_peer_candles(symbol, primary, start_dt, end_dt) if self.enable_advanced_features else {}
         results: Dict[str, Any] = {}
         fold_metrics: List[Dict[str, Any]] = []
 
@@ -668,6 +714,7 @@ class WalkForwardBacktester:
                 split=split,
                 confirm_frames=confirm_frames,
                 multi_tf=multi_tf,
+                peer_candles=peer_candles,
             )
             key = f"fold_{split.fold}"
             results[key] = fold_result
@@ -693,6 +740,9 @@ class WalkForwardBacktester:
             "actual_data_period": f"{_fmt(candles[0]['timestamp'])[:10]} to {_fmt(candles[-1]['timestamp'])[:10]}",
             "train_folds": len(splits),
             "multi_tf": multi_tf,
+            "advanced_features": bool(self.enable_advanced_features),
+            "feature_groups_active": list(self.feature_groups) if self.enable_advanced_features else [],
+            "peer_symbols_loaded": sorted(peer_candles.keys()),
             "data_snapshot": _snapshot(primary_df, primary),
             "costs": {
                 "slippage_pips": self.slippage_pips,
@@ -701,6 +751,34 @@ class WalkForwardBacktester:
             "results": results,
             "aggregate": aggregate,
         }
+
+    def _load_peer_candles(
+        self,
+        symbol: str,
+        timeframe: str,
+        start: datetime,
+        end: datetime,
+    ) -> Dict[str, List[Dict[str, Any]]]:
+        """Download peer OHLC for correlation features (skip primary itself)."""
+        assert self.loader is not None
+        out: Dict[str, List[Dict[str, Any]]] = {}
+        primary = symbol.upper()
+        for peer in self.peer_symbols:
+            if peer == primary:
+                continue
+            try:
+                frame = self.loader.download_broker_data(
+                    peer, start, end, timeframe=timeframe, min_bars=50, persist=True
+                )
+                candles = self.loader.candles_from_frame(frame, peer, timeframe)
+                if len(candles) >= 50:
+                    out[peer] = candles
+                    logger.info("peer loaded %s %s bars=%s", peer, timeframe, len(candles))
+                else:
+                    logger.warning("peer %s %s too short (%s bars)", peer, timeframe, len(candles))
+            except Exception as exc:
+                logger.warning("peer %s unavailable: %s", peer, exc)
+        return out
 
     def _run_fold(
         self,
@@ -711,6 +789,7 @@ class WalkForwardBacktester:
         split: TrainTestSplit,
         confirm_frames: Mapping[str, Any],
         multi_tf: bool,
+        peer_candles: Mapping[str, Sequence[Dict[str, Any]]] | None = None,
     ) -> Dict[str, Any]:
         from ai.config.settings import AIConfig
         from ai.models.trainer import create_model_trainer
@@ -746,7 +825,25 @@ class WalkForwardBacktester:
         # Avoid all-NaN feature rows on Yahoo FX (no package changes — config only).
         cfg.features.dropna = False
         cfg.features.multi_timeframes = []
-        cfg.features.correlation_symbols = []
+        peers = peer_candles or {}
+        if self.enable_advanced_features:
+            cfg.features.enabled_groups = list(self.feature_groups)
+            cfg.features.correlation_symbols = [
+                p for p in self.peer_symbols if p != symbol.upper()
+            ]
+            active_groups = sorted({g.lower() for g in cfg.features.enabled_groups})
+            logger.info(
+                "fold %s %s %s advanced features ON groups=%s peers=%s",
+                split.fold,
+                symbol,
+                primary,
+                active_groups,
+                sorted(peers.keys()),
+            )
+        else:
+            # Phase 5a baseline: disable correlation peers for training stability.
+            cfg.features.correlation_symbols = []
+            active_groups = sorted({g.lower() for g in cfg.features.enabled_groups})
         # Realistic costs: slippage via executor points; commission applied in price units
         # (RiskManager sizes in notional units, not exchange lots).
         pip = PIP_SIZE.get(symbol.upper(), 0.0001)
@@ -755,11 +852,19 @@ class WalkForwardBacktester:
         cfg.storage.root_dir = self.artifact_dir / "models"
         cfg.ensure_directories()
 
+        def _peers_upto(end_ts: datetime) -> List[Dict[str, Any]]:
+            cutoff = _as_utc(end_ts).replace(tzinfo=None)
+            pack: List[Dict[str, Any]] = []
+            for rows in peers.values():
+                pack.extend(c for c in rows if _as_utc(c["timestamp"]).replace(tzinfo=None) <= cutoff)
+            return pack
+
+        train_pack = list(train_candles) + _peers_upto(split.train_end)
         trainer = create_model_trainer(cfg)
         train_out = trainer.train(
             symbol=symbol,
             model_type=self.model_type,
-            candles=train_candles,
+            candles=train_pack,
             register=True,
         )
         train_accuracy = _extract_accuracy(train_out.get("metrics") or {})
@@ -778,8 +883,11 @@ class WalkForwardBacktester:
 
         # Feature matrix on train+test chronologically (indicators are causal / backward-looking).
         combined = train_candles + test_candles
-        frame = pipeline.build_features(combined)
+        feature_pack = list(combined) + _peers_upto(split.test_end)
+        frame = pipeline.build_features(feature_pack)
         ts_to_idx = {_norm_ts(t): i for i, t in enumerate(frame.timestamps)}
+        # FeatureFrame may include only primary-symbol rows; filter index map to primary bars.
+        generated_groups = list((frame.metadata or {}).get("generated_groups") or [])
 
         signals = create_signal_generator(cfg)
         signals.engine.filters.session_filter = False  # type: ignore[union-attr]
@@ -981,6 +1089,7 @@ class WalkForwardBacktester:
             1e-6,
         ) if test_candles else 1.0
 
+        importance = _fold_feature_importance(pipeline.model, frame.feature_names) if self.enable_advanced_features else {}
         return {
             "train_period": f"{_fmt(split.train_start)} to {_fmt(split.train_end)}",
             "test_period": f"{_fmt(split.test_start)} to {_fmt(split.test_end)}",
@@ -999,6 +1108,15 @@ class WalkForwardBacktester:
             "significance": significance,
             "equity_end": float(equity_curve[-1]) if equity_curve else self.initial_equity,
             "model_registration": train_out.get("registered"),
+            "feature_groups_active": active_groups,
+            "generated_feature_groups": generated_groups,
+            "n_features": len(frame.feature_names),
+            "peer_symbols": sorted(peers.keys()),
+            "model_params": {
+                "model_type": self.model_type,
+                "random_seed": self.random_seed,
+            },
+            "feature_importance_top10": importance,
         }
 
     def _higher_tf_bias(
@@ -1391,3 +1509,30 @@ def _atr(candles: Sequence[Dict[str, Any]], period: int = 14) -> float:
         trs.append(max(high - low, abs(high - prev), abs(low - prev)))
     window = trs[-period:] if len(trs) >= period else trs
     return float(np.mean(window)) if window else 0.0001
+
+
+def _fold_feature_importance(model: Any, feature_names: Sequence[str], top_k: int = 10) -> Dict[str, float]:
+    """Top-k importance via model importances or SHAP explainer fallback."""
+    if model is None or not feature_names:
+        return {}
+    try:
+        from ai.explainability.feature_importance import model_feature_importance
+
+        estimator = getattr(model, "estimator", None) or getattr(model, "model", None) or model
+        fi = model_feature_importance(estimator, feature_names=list(feature_names))
+        return fi.top(top_k)
+    except Exception:
+        pass
+    try:
+        from ai.explainability.shap_explainer import ShapExplainer
+
+        # Tiny background of zeros — explainer falls back when shap is missing.
+        background = np.zeros((min(20, len(feature_names)), len(feature_names)), dtype=float)
+        explainer = ShapExplainer(model=model, background=background, feature_names=list(feature_names))
+        explanation = explainer.explain(background[:5])
+        scores = explanation.mean_abs()
+        ordered = sorted(scores.items(), key=lambda item: abs(item[1]), reverse=True)
+        return {name: float(score) for name, score in ordered[:top_k]}
+    except Exception:
+        logger.debug("feature importance unavailable", exc_info=True)
+        return {}
