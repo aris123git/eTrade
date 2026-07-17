@@ -22,6 +22,9 @@ from ai.training.validation import (
     walk_forward_validation,
 )
 
+# NOTE: TrainingScheduler is imported from ai.training.scheduler directly to
+# avoid circular imports with ai.models.trainer / ai.services.pipeline.
+
 __all__ = [
     "Trainer",
     "TrainResult",

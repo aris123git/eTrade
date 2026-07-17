@@ -12,6 +12,7 @@ from ai.monitoring.drift import (
 )
 from ai.monitoring.metrics import MetricRecorder, ResourceMetrics, collect_resource_metrics
 from ai.monitoring.tracker import PerformanceRecord, PerformanceTracker
+from ai.monitoring.live import LiveMonitor, LiveSnapshot, create_live_monitor
 
 __all__ = [
     "Alert",
@@ -29,4 +30,7 @@ __all__ = [
     "collect_resource_metrics",
     "PerformanceRecord",
     "PerformanceTracker",
+    "LiveMonitor",
+    "LiveSnapshot",
+    "create_live_monitor",
 ]

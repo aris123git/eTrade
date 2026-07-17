@@ -2,14 +2,15 @@
 ai/risk/manager.py - Portfolio and trade risk controls.
 
 RESPONSIBILITY:
-Provide position sizing, stop management, and portfolio limit validation using
-AIConfig.RiskConfig.
+Provide position sizing, stop management, portfolio limit validation, circuit
+breaker enforcement, and per-symbol / asset-class limits using AIConfig.RiskConfig.
 
-VERSION: 1.0.0
+VERSION: 1.1.0
 """
 
 from __future__ import annotations
 
+import logging
 from dataclasses import dataclass, field
 from datetime import date, datetime, timezone
 from typing import Any, Dict, Iterable, Mapping, Sequence
@@ -17,6 +18,26 @@ from typing import Any, Dict, Iterable, Mapping, Sequence
 from ai.config.settings import AIConfig, RiskConfig
 from ai.signals import TradeSignal
 from ai.utils.types import SignalType
+
+logger = logging.getLogger(__name__)
+
+# Lightweight default asset-class map for concentration checks.
+DEFAULT_ASSET_CLASSES: Dict[str, str] = {
+    "EURUSD": "fx_major",
+    "GBPUSD": "fx_major",
+    "USDJPY": "fx_major",
+    "AUDUSD": "fx_major",
+    "USDCAD": "fx_major",
+    "USDCHF": "fx_major",
+    "XAUUSD": "metal",
+    "XAGUSD": "metal",
+    "US30": "index",
+    "DJ30": "index",
+    "NAS100": "index",
+    "SPX500": "index",
+    "BTCUSD": "crypto",
+    "ETHUSD": "crypto",
+}
 
 
 @dataclass(frozen=True)
@@ -51,11 +72,21 @@ class RiskManager:
     peak_equity: float | None = None
     day_start_equity: float | None = None
     current_day: date | None = None
+    circuit_breaker_tripped: bool = False
+    asset_class_map: Dict[str, str] = field(default_factory=dict)
 
     def __post_init__(self) -> None:
         self.peak_equity = self.equity if self.peak_equity is None else self.peak_equity
         self.day_start_equity = self.equity if self.day_start_equity is None else self.day_start_equity
         self.current_day = datetime.now(timezone.utc).date() if self.current_day is None else self.current_day
+        if not self.asset_class_map:
+            self.asset_class_map = dict(DEFAULT_ASSET_CLASSES)
+        logger.info(
+            "RiskManager ready equity=%.2f circuit_breaker=%.2f%% max_dd=%.2f%%",
+            self.equity,
+            self.risk_config.circuit_breaker_loss * 100.0,
+            self.risk_config.max_drawdown * 100.0,
+        )
 
     @property
     def risk_config(self) -> RiskConfig:
@@ -73,6 +104,24 @@ class RiskManager:
         if self.current_day != ts.date():
             self.current_day = ts.date()
             self.day_start_equity = value
+        if self._drawdown(value) >= self.risk_config.circuit_breaker_loss:
+            if not self.circuit_breaker_tripped:
+                logger.error(
+                    "CIRCUIT BREAKER tripped drawdown=%.2f%% threshold=%.2f%%",
+                    self._drawdown(value) * 100.0,
+                    self.risk_config.circuit_breaker_loss * 100.0,
+                )
+            self.circuit_breaker_tripped = True
+
+    def reset_circuit_breaker(self) -> None:
+        """Manual reset after operator review."""
+
+        self.circuit_breaker_tripped = False
+        logger.warning("circuit breaker manually reset")
+
+    def asset_class(self, symbol: str) -> str:
+        key = str(symbol).upper().split(".")[0]
+        return self.asset_class_map.get(key, self.asset_class_map.get(symbol.upper(), "other"))
 
     def size_position(
         self,
@@ -88,20 +137,23 @@ class RiskManager:
         pip_value: float = 1.0,
         fixed_lot: float | None = None,
     ) -> float:
-        """Size a position using fixed_risk, kelly, atr, or fixed_lot."""
+        """Size a position using fixed_risk, kelly, atr, volatility, or fixed_lot."""
 
         account_equity = float(self.equity if equity is None else equity)
         mode = str(self.risk_config.position_sizing).lower()
         if mode == "fixed_lot":
-            return self._clip_lot(fixed_lot or self.risk_config.default_lot_size)
+            size = self._clip_lot(fixed_lot or self.risk_config.default_lot_size)
+            return self._apply_drawdown_scale(size, account_equity)
 
         stop_distance = self._stop_distance(entry=entry, stop_loss=stop_loss, atr=atr)
         if stop_distance <= 0:
             return 0.0
-        risk_fraction = self._risk_fraction(mode, confidence=confidence, win_rate=win_rate, reward_risk=reward_risk)
+        risk_fraction = self._risk_fraction(
+            mode, confidence=confidence, win_rate=win_rate, reward_risk=reward_risk, atr=atr, entry=entry
+        )
         risk_amount = account_equity * min(risk_fraction, self.risk_config.max_risk_per_trade)
         units = risk_amount / max(stop_distance * max(float(pip_value), 1e-12), 1e-12)
-        return self._clip_lot(units)
+        return self._apply_drawdown_scale(self._clip_lot(units), account_equity)
 
     def validate_signal(
         self,
@@ -112,11 +164,43 @@ class RiskManager:
         correlations: Mapping[Any, float] | None = None,
         atr: float | None = None,
         pip_value: float = 1.0,
+        margin_available: float | None = None,
+        required_margin: float | None = None,
     ) -> RiskDecision:
         """Validate a TradeSignal against trade and portfolio risk rules."""
 
+        return self.pre_trade_validate(
+            signal,
+            open_positions=open_positions,
+            equity=equity,
+            correlations=correlations,
+            atr=atr,
+            pip_value=pip_value,
+            margin_available=margin_available,
+            required_margin=required_margin,
+        )
+
+    def pre_trade_validate(
+        self,
+        signal: TradeSignal,
+        *,
+        open_positions: Sequence[Any] | None = None,
+        equity: float | None = None,
+        correlations: Mapping[Any, float] | None = None,
+        atr: float | None = None,
+        pip_value: float = 1.0,
+        margin_available: float | None = None,
+        required_margin: float | None = None,
+    ) -> RiskDecision:
+        """
+        Pre-trade validation: position size, margin, correlation, circuit breaker,
+        and per-symbol / asset-class limits.
+        """
+
         if signal.side == SignalType.HOLD:
             return RiskDecision(True, "hold_signal", metadata={"side": signal.side.value})
+        if self.circuit_breaker_tripped:
+            return RiskDecision(False, "circuit_breaker_active", metadata={"drawdown": self._drawdown(float(equity or self.equity))})
         if signal.confidence < self.risk_config.min_confidence:
             return RiskDecision(False, "confidence_below_minimum", metadata={"confidence": signal.confidence})
         if signal.entry is None:
@@ -128,8 +212,25 @@ class RiskManager:
         if rr is not None and rr < self.risk_config.min_expected_rr:
             return RiskDecision(False, "reward_risk_below_minimum", metadata={"reward_risk": rr})
 
+        positions = list(open_positions or ())
+        symbol_count = sum(1 for p in positions if str(_get(p, "symbol", "")).upper() == signal.symbol.upper())
+        if symbol_count >= int(self.risk_config.max_positions_per_symbol):
+            return RiskDecision(
+                False,
+                "max_positions_per_symbol_exceeded",
+                metadata={"symbol": signal.symbol, "count": symbol_count},
+            )
+        asset_class = self.asset_class(signal.symbol)
+        class_count = sum(1 for p in positions if self.asset_class(str(_get(p, "symbol", ""))) == asset_class)
+        if class_count >= int(self.risk_config.max_positions_per_asset_class):
+            return RiskDecision(
+                False,
+                "max_positions_per_asset_class_exceeded",
+                metadata={"asset_class": asset_class, "count": class_count},
+            )
+
         portfolio = self.check_portfolio_limits(
-            open_positions=open_positions or (),
+            open_positions=positions,
             equity=equity,
             new_signal=signal,
             correlations=correlations,
@@ -153,7 +254,31 @@ class RiskManager:
         max_trade_risk = float(equity or self.equity) * self.risk_config.max_risk_per_trade
         if risk_amount > max_trade_risk:
             return RiskDecision(False, "risk_per_trade_exceeded", size=size, risk_amount=risk_amount)
-        return RiskDecision(True, "approved", size=size, risk_amount=risk_amount, metadata={"reward_risk": rr})
+
+        if margin_available is not None and required_margin is not None:
+            if float(required_margin) > float(margin_available):
+                return RiskDecision(
+                    False,
+                    "insufficient_margin",
+                    size=size,
+                    risk_amount=risk_amount,
+                    metadata={"margin_available": margin_available, "required_margin": required_margin},
+                )
+
+        logger.info(
+            "pre-trade APPROVED %s size=%.4f risk=%.2f class=%s",
+            signal.symbol,
+            size,
+            risk_amount,
+            asset_class,
+        )
+        return RiskDecision(
+            True,
+            "approved",
+            size=size,
+            risk_amount=risk_amount,
+            metadata={"reward_risk": rr, "asset_class": asset_class},
+        )
 
     def update_stops(
         self,
@@ -191,8 +316,12 @@ class RiskManager:
         """Validate drawdown, daily loss, exposure, correlation, and open trade limits."""
 
         account_equity = float(self.equity if equity is None else equity)
-        if self._drawdown(account_equity) >= self.risk_config.max_drawdown:
-            return RiskDecision(False, "max_drawdown_exceeded", metadata={"drawdown": self._drawdown(account_equity)})
+        dd = self._drawdown(account_equity)
+        if dd >= self.risk_config.circuit_breaker_loss or self.circuit_breaker_tripped:
+            self.circuit_breaker_tripped = True
+            return RiskDecision(False, "circuit_breaker_active", metadata={"drawdown": dd})
+        if dd >= self.risk_config.max_drawdown:
+            return RiskDecision(False, "max_drawdown_exceeded", metadata={"drawdown": dd})
         if self._daily_loss(account_equity) >= self.risk_config.daily_loss_limit:
             return RiskDecision(False, "daily_loss_limit_exceeded", metadata={"daily_loss": self._daily_loss(account_equity)})
 
@@ -222,15 +351,32 @@ class RiskManager:
         confidence: float | None,
         win_rate: float | None,
         reward_risk: float | None,
+        atr: float | None = None,
+        entry: float | None = None,
     ) -> float:
         if mode == "kelly":
             probability = _bounded(win_rate if win_rate is not None else confidence, 0.0, 1.0)
             payoff = max(float(reward_risk or self.risk_config.min_expected_rr), 1e-12)
             kelly = probability - (1.0 - probability) / payoff
             return max(kelly, 0.0) * self.risk_config.kelly_fraction
-        if mode == "atr":
-            return self.risk_config.risk_per_trade
+        if mode in {"atr", "volatility"}:
+            base = self.risk_config.risk_per_trade
+            if atr is not None and entry is not None and float(entry) > 0:
+                vol = float(atr) / float(entry)
+                # Higher realized vol → smaller risk fraction (volatility-adjusted).
+                scale = 1.0 / max(1.0, vol / 0.01)
+                return base * min(scale, 1.0)
+            return base
         return self.risk_config.risk_per_trade
+
+    def _apply_drawdown_scale(self, size: float, equity: float) -> float:
+        if not self.risk_config.drawdown_size_scale or size <= 0:
+            return size
+        dd = self._drawdown(equity)
+        max_dd = max(float(self.risk_config.max_drawdown), 1e-12)
+        # Linearly reduce size toward zero as drawdown approaches max.
+        scale = max(0.25, 1.0 - (dd / max_dd) * 0.75)
+        return self._clip_lot(size * scale)
 
     def _stop_distance(self, *, entry: float, stop_loss: float | None, atr: float | None) -> float:
         if stop_loss is not None:

@@ -14,6 +14,13 @@ from ai.explainability.feature_importance import (
 )
 from ai.explainability.permutation import PermutationImportanceResult, permutation_importance
 from ai.explainability.shap_explainer import ShapExplainer, ShapExplanation, explain_shap
+from ai.explainability.explainer import (
+    ConfidenceInterval,
+    ExplanationReport,
+    ModelExplainer,
+    TreeExplanation,
+    create_model_explainer,
+)
 
 __all__ = [
     "ConfidenceExplanation",
@@ -29,4 +36,9 @@ __all__ = [
     "ShapExplainer",
     "ShapExplanation",
     "explain_shap",
+    "ConfidenceInterval",
+    "ExplanationReport",
+    "ModelExplainer",
+    "TreeExplanation",
+    "create_model_explainer",
 ]

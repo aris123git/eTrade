@@ -1,5 +1,6 @@
 *$py.class
 ai_artifacts/
+ai/artifacts/
 data/database/*.db
 data/database/*.db-*
 *.egg-info/

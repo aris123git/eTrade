@@ -8,6 +8,7 @@ VERSION: 1.0.0
 """
 
 from ai.signals.engine import RiskHook, SignalEngine, SignalFilterConfig, TradeSignal, create_signal_engine
+from ai.signals.generator import SignalGenerator, create_signal_generator
 
 __all__ = [
     "RiskHook",
@@ -15,4 +16,6 @@ __all__ = [
     "SignalFilterConfig",
     "TradeSignal",
     "create_signal_engine",
+    "SignalGenerator",
+    "create_signal_generator",
 ]

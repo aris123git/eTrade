@@ -182,7 +182,10 @@ class RiskConfig:
     max_correlation: float = 0.75
     daily_loss_limit: float = 0.03
     max_drawdown: float = 0.15
-    position_sizing: str = "fixed_risk"  # fixed_risk | kelly | atr | fixed_lot
+    circuit_breaker_loss: float = 0.05  # halt new trades after X% equity loss from peak
+    max_positions_per_symbol: int = 1
+    max_positions_per_asset_class: int = 3
+    position_sizing: str = "fixed_risk"  # fixed_risk | kelly | atr | fixed_lot | volatility
     kelly_fraction: float = 0.25
     atr_stop_mult: float = 1.5
     atr_tp_mult: float = 2.5
@@ -193,6 +196,7 @@ class RiskConfig:
     account_currency: str = "USD"
     default_lot_size: float = 0.01
     max_lot_size: float = 10.0
+    drawdown_size_scale: bool = True  # shrink size as drawdown approaches max
 
 
 @dataclass

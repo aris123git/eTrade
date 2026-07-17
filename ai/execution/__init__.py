@@ -10,6 +10,7 @@ VERSION: 1.0.0
 from ai.execution.executor import (
     ExecutionReport,
     Fill,
+    LiveBrokerClient,
     Order,
     OrderExecutor,
     OrderStatus,
@@ -19,6 +20,7 @@ from ai.execution.executor import (
 __all__ = [
     "ExecutionReport",
     "Fill",
+    "LiveBrokerClient",
     "Order",
     "OrderExecutor",
     "OrderStatus",

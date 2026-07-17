@@ -3,16 +3,18 @@ ai/portfolio/manager.py - Portfolio state, PnL, and allocation controls.
 
 RESPONSIBILITY:
 Track multi-symbol and multi-broker positions, closed trades, exposure,
-allocation, rebalancing hooks, and performance metrics.
+allocation, correlation concentration, drawdown-aware sizing hooks,
+rebalancing rules, and performance metrics.
 
-VERSION: 1.0.0
+VERSION: 1.1.0
 """
 
 from __future__ import annotations
 
+import logging
 from dataclasses import dataclass, field
 from datetime import datetime, timezone
-from typing import Any, Dict, Iterable, Mapping
+from typing import Any, Dict, Iterable, Mapping, Sequence
 from uuid import uuid4
 
 import numpy as np
@@ -20,6 +22,8 @@ import numpy as np
 from ai.config.settings import AIConfig
 from ai.execution import Fill
 from ai.utils.types import OrderSide, PositionSide
+
+logger = logging.getLogger(__name__)
 
 
 @dataclass
@@ -98,9 +102,20 @@ class PortfolioManager:
     open_positions: Dict[str, Position] = field(default_factory=dict)
     closed_trades: list[Trade] = field(default_factory=list)
     metadata: Dict[str, Any] = field(default_factory=dict)
+    peak_equity: float | None = None
+    returns_history: list[float] = field(default_factory=list)
+    equity_curve: list[float] = field(default_factory=list)
+    _shutdown: bool = False
 
     def __post_init__(self) -> None:
         self.base_currency = self.base_currency or self.config.risk.account_currency
+        self.peak_equity = float(self.cash) if self.peak_equity is None else self.peak_equity
+        self.equity_curve = list(self.equity_curve) or [float(self.cash)]
+        logger.info("PortfolioManager ready cash=%.2f currency=%s", self.cash, self.base_currency)
+
+    def request_shutdown(self) -> None:
+        self._shutdown = True
+        logger.warning("PortfolioManager shutdown requested")
 
     def open_position(
         self,
@@ -117,6 +132,8 @@ class PortfolioManager:
     ) -> Position:
         """Open and register a new position."""
 
+        if self._shutdown:
+            raise RuntimeError("portfolio_shutdown")
         position = Position(
             symbol=symbol,
             side=_position_side(side),
@@ -131,6 +148,15 @@ class PortfolioManager:
         )
         self.open_positions[position.position_id] = position
         self.cash -= float(commission)
+        self._record_equity()
+        logger.info(
+            "opened %s %s size=%.4f @ %.5f broker=%s",
+            position.symbol,
+            position.side.value,
+            position.size,
+            position.entry_price,
+            broker,
+        )
         return position
 
     def close_position(
@@ -163,6 +189,15 @@ class PortfolioManager:
         )
         self.closed_trades.append(trade)
         self.cash += pnl
+        self.returns_history.append(pnl / max(self.peak_equity or abs(pnl) or 1.0, 1e-12))
+        self._record_equity()
+        logger.info(
+            "closed %s %s pnl=%.2f @ %.5f",
+            trade.symbol,
+            trade.side.value,
+            trade.pnl,
+            trade.exit_price,
+        )
         return trade
 
     def apply_fill(self, fill: Fill, *, broker: str = "default") -> Position | Trade:
@@ -175,14 +210,24 @@ class PortfolioManager:
                 price=fill.price,
                 closed_at=fill.timestamp,
                 commission=fill.commission,
-                metadata={"fill": fill},
+                metadata={"fill": fill, **dict(getattr(fill, "metadata", {}) or {})},
             )
+        order_meta = dict(getattr(fill, "metadata", {}) or {})
+        sl = order_meta.get("sl")
+        tp = order_meta.get("tp")
+        # Prefer SL/TP attached via nested order metadata when present.
+        nested_order = order_meta.get("order")
+        if nested_order is not None:
+            sl = sl if sl is not None else getattr(nested_order, "sl", None)
+            tp = tp if tp is not None else getattr(nested_order, "tp", None)
         return self.open_position(
             symbol=fill.symbol,
             side=fill.side,
             size=fill.quantity,
             price=fill.price,
             broker=broker,
+            sl=float(sl) if sl is not None else None,
+            tp=float(tp) if tp is not None else None,
             commission=fill.commission,
             metadata={"fill": fill},
         )
@@ -274,6 +319,93 @@ class PortfolioManager:
                 )
         return suggestions
 
+    def correlation_concentration(
+        self,
+        correlations: Mapping[Any, float],
+        *,
+        threshold: float | None = None,
+    ) -> Dict[str, Any]:
+        """
+        Measure pairwise correlation among open symbols.
+
+        Returns over-concentration flags when abs(corr) exceeds threshold.
+        """
+
+        limit = float(threshold if threshold is not None else self.config.risk.max_correlation)
+        symbols = sorted({p.symbol for p in self.open_positions.values()})
+        pairs: list[Dict[str, Any]] = []
+        max_corr = 0.0
+        for i, a in enumerate(symbols):
+            for b in symbols[i + 1 :]:
+                corr = _lookup_corr(correlations, a, b)
+                max_corr = max(max_corr, abs(corr))
+                if abs(corr) >= limit:
+                    pairs.append({"symbol_a": a, "symbol_b": b, "correlation": corr})
+        overconcentrated = bool(pairs)
+        result = {
+            "symbols": symbols,
+            "max_abs_correlation": max_corr,
+            "threshold": limit,
+            "overconcentrated": overconcentrated,
+            "pairs": pairs,
+        }
+        if overconcentrated:
+            logger.warning("portfolio correlation concentration: %s", pairs)
+        return result
+
+    def drawdown(self) -> float:
+        equity = self.total_equity()
+        peak = max(float(self.peak_equity or equity), 1e-12)
+        return max((peak - equity) / peak, 0.0)
+
+    def size_multiplier_for_drawdown(self) -> float:
+        """Dynamic position sizing factor based on current drawdown."""
+
+        dd = self.drawdown()
+        max_dd = max(float(self.config.risk.max_drawdown), 1e-12)
+        if not self.config.risk.drawdown_size_scale:
+            return 1.0
+        return max(0.25, 1.0 - (dd / max_dd) * 0.75)
+
+    def rebalance_rules(
+        self,
+        *,
+        max_symbol_weight: float = 0.35,
+        correlations: Mapping[Any, float] | None = None,
+    ) -> list[Dict[str, Any]]:
+        """
+        Built-in rebalancing rules:
+        - Cap single-symbol weight
+        - Flag correlated clusters for reduction
+        """
+
+        actions: list[Dict[str, Any]] = []
+        alloc = self.allocation()
+        for symbol, weight in alloc.items():
+            if weight > max_symbol_weight:
+                actions.append(
+                    {
+                        "rule": "max_symbol_weight",
+                        "symbol": symbol,
+                        "action": "decrease",
+                        "current_allocation": weight,
+                        "target_allocation": max_symbol_weight,
+                    }
+                )
+        if correlations:
+            conc = self.correlation_concentration(correlations)
+            for pair in conc["pairs"]:
+                actions.append(
+                    {
+                        "rule": "correlation_cap",
+                        "symbol": pair["symbol_b"],
+                        "action": "decrease",
+                        "correlation": pair["correlation"],
+                        "related_symbol": pair["symbol_a"],
+                    }
+                )
+        return actions
+
     def performance_metrics(self) -> Dict[str, float]:
         """Return key closed and open portfolio performance metrics."""
 
@@ -293,11 +425,19 @@ class PortfolioManager:
             "open_positions": float(len(self.open_positions)),
             "closed_trades": float(len(self.closed_trades)),
             "win_rate": win_rate,
+            "loss_rate": float(1.0 - win_rate) if pnls.size else 0.0,
             "profit_factor": profit_factor,
             "expectancy": expectancy,
             "gross_exposure": float(self.exposure()),
             "net_exposure": float(self.net_exposure()),
+            "drawdown": float(self.drawdown()),
+            "size_multiplier": float(self.size_multiplier_for_drawdown()),
         }
+
+    def _record_equity(self) -> None:
+        equity = float(self.total_equity())
+        self.peak_equity = max(float(self.peak_equity or equity), equity)
+        self.equity_curve.append(equity)
 
     def _find_opposite_position(self, symbol: str, fill_side: OrderSide, broker: str) -> Position | None:
         target_side = PositionSide.SHORT if fill_side == OrderSide.BUY else PositionSide.LONG
@@ -340,3 +480,11 @@ def _utc(value: datetime) -> datetime:
     if value.tzinfo is None:
         return value.replace(tzinfo=timezone.utc)
     return value.astimezone(timezone.utc)
+
+
+def _lookup_corr(correlations: Mapping[Any, float], a: str, b: str) -> float:
+    keys = ((a, b), (b, a), f"{a}:{b}", f"{b}:{a}")
+    for key in keys:
+        if key in correlations:
+            return float(correlations[key])
+    return 0.0
