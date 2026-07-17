@@ -5,6 +5,7 @@ ai/research - Autonomous Quantitative Research Engine (Phase 4).
 from ai.research.autonomous_scheduler import AutonomousScheduler, SchedulePlan
 from ai.research.config import ResearchConfig
 from ai.research.discovery import FeatureHypothesis, HypothesisDiscoveryEngine
+from ai.research.edge_proof import EdgeEvidence, EdgeProofEngine, create_edge_proof_engine
 from ai.research.gate import GateDecision, decide_promotion
 from ai.research.hypotheses import Hypothesis, generate_hypotheses
 from ai.research.paper_journal import PaperTradingJournal
@@ -20,6 +21,9 @@ __all__ = [
     "ResearchConfig",
     "FeatureHypothesis",
     "HypothesisDiscoveryEngine",
+    "EdgeEvidence",
+    "EdgeProofEngine",
+    "create_edge_proof_engine",
     "GateDecision",
     "decide_promotion",
     "Hypothesis",
