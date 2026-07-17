@@ -1,0 +1,262 @@
+{
+  "phase": "5b_vs_5a",
+  "generated_at": "2026-07-17T23:18:01.902303+00:00",
+  "feature_config": {
+    "feature_config_version": "phase5b-v1",
+    "enabled_groups": [
+      "candle_structure",
+      "channels",
+      "correlation",
+      "microstructure",
+      "momentum",
+      "moving_averages",
+      "patterns",
+      "price",
+      "regime",
+      "returns",
+      "session",
+      "structure",
+      "volatility",
+      "volume"
+    ],
+    "required_advanced_groups": [
+      "correlation",
+      "microstructure",
+      "regime",
+      "session",
+      "volatility"
+    ],
+    "missing_advanced_groups": [],
+    "ok": true,
+    "peer_symbols": [
+      "US30",
+      "SPX500",
+      "XAUUSD",
+      "USOIL",
+      "USDJPY",
+      "US10Y"
+    ]
+  },
+  "preferred_compare_timeframe": "D1",
+  "model_type_phase5b": "random_forest",
+  "note": "Phase 5a baseline used random_forest with advanced features disabled; Phase 5b enables microstructure/regime/correlation/session/volatility with model_type=random_forest.",
+  "comparison_table": [
+    {
+      "symbol": "EURUSD",
+      "phase5a_wr": 0.5,
+      "phase5b_wr": 0.5227272727272727,
+      "delta_wr": 0.022727272727272707,
+      "phase5a_sharpe": 0.30584073981120463,
+      "phase5b_sharpe": 0.39921684332875007,
+      "delta_sharpe": 0.09337610351754544,
+      "phase5a_pf": 1.5739634664480082,
+      "phase5b_pf": 1.742818051075651,
+      "delta_pf": 0.1688545846276428,
+      "phase5a_max_dd": -4.203436700345212,
+      "phase5b_max_dd": -4.203436700345212,
+      "delta_max_dd": 0.0,
+      "flags": [
+        "notable_wr_improvement"
+      ],
+      "timeframe": "D1",
+      "phase5b_passes_gate": false,
+      "phase5a_failures": [
+        "win_rate_or_significance",
+        "sharpe"
+      ],
+      "phase5b_failures": [
+        "win_rate_or_significance",
+        "sharpe"
+      ]
+    },
+    {
+      "symbol": "GBPUSD",
+      "phase5a_wr": 0.5416666666666667,
+      "phase5b_wr": 0.5416666666666667,
+      "delta_wr": 0.0,
+      "phase5a_sharpe": 0.4684365517630597,
+      "phase5b_sharpe": 0.4679064508291185,
+      "delta_sharpe": -0.00053010093394118,
+      "phase5a_pf": 1.7527062538062306,
+      "phase5b_pf": 1.7224115051183664,
+      "delta_pf": -0.030294748687864193,
+      "phase5a_max_dd": -3.954229831418685,
+      "phase5b_max_dd": -3.9541998564923535,
+      "delta_max_dd": 2.997492633127763e-05,
+      "flags": [],
+      "timeframe": "D1",
+      "phase5b_passes_gate": false,
+      "phase5a_failures": [
+        "win_rate_or_significance",
+        "sharpe"
+      ],
+      "phase5b_failures": [
+        "win_rate_or_significance",
+        "sharpe"
+      ]
+    },
+    {
+      "symbol": "USDJPY",
+      "phase5a_wr": 0.6083333333333334,
+      "phase5b_wr": 0.5333333333333333,
+      "delta_wr": -0.07500000000000007,
+      "phase5a_sharpe": 1.0008952463257652,
+      "phase5b_sharpe": 0.6035572937344414,
+      "delta_sharpe": -0.39733795259132376,
+      "phase5a_pf": 2.812720860554428,
+      "phase5b_pf": 1.7145322432138803,
+      "delta_pf": -1.0981886173405475,
+      "phase5a_max_dd": -4.498596253272563,
+      "phase5b_max_dd": -4.67860408835401,
+      "delta_max_dd": -0.18000783508144735,
+      "flags": [
+        "warning_wr_regression"
+      ],
+      "timeframe": "D1",
+      "phase5b_passes_gate": false,
+      "phase5a_failures": [
+        "win_rate_or_significance",
+        "regime_unstable"
+      ],
+      "phase5b_failures": [
+        "win_rate_or_significance",
+        "regime_unstable"
+      ]
+    },
+    {
+      "symbol": "XAUUSD",
+      "phase5a_wr": 0.4074074074074074,
+      "phase5b_wr": 0.42857142857142855,
+      "delta_wr": 0.021164021164021163,
+      "phase5a_sharpe": -0.1300246658607532,
+      "phase5b_sharpe": 0.0658912814473855,
+      "delta_sharpe": 0.19591594730813872,
+      "phase5a_pf": 1.0562008649775079,
+      "phase5b_pf": 1.1403967249077953,
+      "delta_pf": 0.08419585993028744,
+      "phase5a_max_dd": -5.927861258057162,
+      "phase5b_max_dd": -7.084402433563787,
+      "delta_max_dd": -1.156541175506625,
+      "flags": [
+        "notable_wr_improvement"
+      ],
+      "timeframe": "D1",
+      "phase5b_passes_gate": false,
+      "phase5a_failures": [
+        "win_rate_or_significance",
+        "sharpe",
+        "profit_factor"
+      ],
+      "phase5b_failures": [
+        "win_rate_or_significance",
+        "sharpe",
+        "profit_factor"
+      ]
+    }
+  ],
+  "decision": {
+    "decision": "NO_EDGE_DETECTED",
+    "proceed_to_phase_5c": false,
+    "symbols_for_phase_5c": [],
+    "symbols_passed": 0,
+    "symbols_required_full": 4,
+    "symbols_required_partial": 3,
+    "max_delta_sharpe": 0.19591594730813872,
+    "symbols_with_promising_delta": [],
+    "rationale": "Advanced features did not create a robust edge. Consider Option C (different markets) or Option D (pivot).",
+    "answer": "NO \u2014 advanced features did not create an exploitable edge on these symbols."
+  },
+  "feature_importance": {
+    "top10_aggregate": {
+      "micro_sell_volume": 0.3408185324231787,
+      "micro_clv": 0.283073165763428,
+      "candle_lower_wick_ratio": 0.27896116108385277,
+      "candle_close_location": 0.264104527849509,
+      "micro_buy_volume": 0.2491542982677933,
+      "micro_order_flow_imbalance": 0.23295579022855964,
+      "candle_upper_wick_ratio": 0.2181438349126737,
+      "candle_open_location": 0.18021380581371757,
+      "micro_bid_ask_ratio": 0.17865505180701732,
+      "micro_ofi_zscore_10": 0.14620049201754917
+    },
+    "advanced_group_importance": {
+      "microstructure": 1.8296651258901744,
+      "regime": 0.0804649314085428,
+      "correlation": 0.13224827580606358,
+      "session": 0.10192359826647474,
+      "volatility": 0.0
+    },
+    "per_symbol_top10": {
+      "EURUSD": {
+        "micro_sell_volume": 0.11553453448838474,
+        "candle_lower_wick_ratio": 0.09493898320062864,
+        "micro_clv": 0.0908901067999674,
+        "micro_buy_volume": 0.08213685981649019,
+        "candle_close_location": 0.07604747338425871,
+        "micro_order_flow_imbalance": 0.07464360260006439,
+        "candle_upper_wick_ratio": 0.07447653823629805,
+        "candle_open_location": 0.0713936512542398,
+        "micro_bid_ask_ratio": 0.07108432736160314,
+        "pattern_directional_score": 0.038976616550700144
+      },
+      "GBPUSD": {
+        "micro_sell_volume": 0.1077558332099218,
+        "micro_clv": 0.0940128757764262,
+        "micro_buy_volume": 0.08313595426442791,
+        "candle_lower_wick_ratio": 0.08231107647977198,
+        "candle_close_location": 0.08164582009873006,
+        "micro_bid_ask_ratio": 0.07154601431486335,
+        "micro_order_flow_imbalance": 0.06889699400752305,
+        "candle_upper_wick_ratio": 0.06295526862763672,
+        "candle_open_location": 0.06041063085253612,
+        "micro_ofi_zscore_5": 0.03493409415404616
+      },
+      "USDJPY": {
+        "micro_sell_volume": 0.11110408336961508,
+        "candle_lower_wick_ratio": 0.10171110140345217,
+        "micro_ofi_zscore_10": 0.09960611657143668,
+        "micro_clv": 0.09817018318703444,
+        "candle_close_location": 0.09384986824124886,
+        "micro_buy_volume": 0.08388148418687519,
+        "candle_upper_wick_ratio": 0.08071202804873896,
+        "micro_order_flow_imbalance": 0.07558371689834412,
+        "micro_ofi_zscore_20": 0.053606586244350336,
+        "candle_open_location": 0.04840952370694165
+      },
+      "XAUUSD": {
+        "session_close_location": 0.018842667098486372,
+        "micro_ofi_zscore_5": 0.01500361659149785,
+        "micro_ofi_zscore_10": 0.014458155274339243,
+        "micro_order_flow_imbalance": 0.013831476722628092,
+        "micro_ofi_zscore_20": 0.013349891817281558,
+        "candle_close_location": 0.012561366125271346,
+        "micro_ofi_zscore_50": 0.012484101754627365,
+        "regime_efficiency_ratio_10": 0.012181711198861215,
+        "ichimoku_cloud_width": 0.011930456293556263,
+        "session_dist_from_low": 0.011754787301192612
+      }
+    },
+    "new_features_helped_most": [
+      [
+        "microstructure",
+        1.8296651258901744
+      ],
+      [
+        "correlation",
+        0.13224827580606358
+      ],
+      [
+        "session",
+        0.10192359826647474
+      ],
+      [
+        "regime",
+        0.0804649314085428
+      ],
+      [
+        "volatility",
+        0.0
+      ]
+    ]
+  }
+}

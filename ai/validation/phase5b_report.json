@@ -1,0 +1,4605 @@
+{
+  "phase": "5b",
+  "generated_at": "2026-07-17T23:18:01.902313+00:00",
+  "config": {
+    "symbols": [
+      "EURUSD",
+      "GBPUSD",
+      "USDJPY",
+      "XAUUSD"
+    ],
+    "timeframes": [
+      "M15",
+      "H1",
+      "H4",
+      "D1"
+    ],
+    "start_date": "2019-01-01",
+    "end_date": "2024-12-31",
+    "train_period_years": 4,
+    "test_period_years": 1,
+    "overlap": 0,
+    "paper_slippage_pips": 2.0,
+    "paper_commission_pips": 0.3,
+    "random_seed": 42,
+    "feature_groups": [
+      "price",
+      "returns",
+      "moving_averages",
+      "momentum",
+      "volatility",
+      "channels",
+      "volume",
+      "candle_structure",
+      "patterns",
+      "structure",
+      "session",
+      "regime",
+      "microstructure",
+      "correlation"
+    ],
+    "advanced_groups": [
+      "microstructure",
+      "regime",
+      "correlation",
+      "session",
+      "volatility"
+    ],
+    "peer_symbols": [
+      "US30",
+      "SPX500",
+      "XAUUSD",
+      "USOIL",
+      "USDJPY",
+      "US10Y"
+    ],
+    "feature_config_version": "phase5b-v1",
+    "compare_vs_phase5a": true,
+    "model_type": "random_forest",
+    "enable_advanced_features": true
+  },
+  "feature_config_check": {
+    "feature_config_version": "phase5b-v1",
+    "enabled_groups": [
+      "candle_structure",
+      "channels",
+      "correlation",
+      "microstructure",
+      "momentum",
+      "moving_averages",
+      "patterns",
+      "price",
+      "regime",
+      "returns",
+      "session",
+      "structure",
+      "volatility",
+      "volume"
+    ],
+    "required_advanced_groups": [
+      "correlation",
+      "microstructure",
+      "regime",
+      "session",
+      "volatility"
+    ],
+    "missing_advanced_groups": [],
+    "ok": true,
+    "peer_symbols": [
+      "US30",
+      "SPX500",
+      "XAUUSD",
+      "USOIL",
+      "USDJPY",
+      "US10Y"
+    ]
+  },
+  "series": [
+    {
+      "symbol": "EURUSD",
+      "timeframe": "M15",
+      "period": "2019-01-01 to 2024-12-31",
+      "actual_data_period": "2026-04-26 to 2026-07-17",
+      "train_folds": 1,
+      "multi_tf": false,
+      "advanced_features": true,
+      "feature_groups_active": [
+        "price",
+        "returns",
+        "moving_averages",
+        "momentum",
+        "volatility",
+        "channels",
+        "volume",
+        "candle_structure",
+        "patterns",
+        "structure",
+        "session",
+        "regime",
+        "microstructure",
+        "correlation"
+      ],
+      "peer_symbols_loaded": [
+        "SPX500",
+        "US10Y",
+        "US30",
+        "USDJPY",
+        "USOIL",
+        "XAUUSD"
+      ],
+      "data_snapshot": {
+        "timeframe": "M15",
+        "bars": 5666,
+        "start": "2026-04-26 23:00:00+00:00",
+        "end": "2026-07-17 21:15:00+00:00",
+        "source": "candle_repository_or_yahoo"
+      },
+      "costs": {
+        "slippage_pips": 2.0,
+        "commission_pips": 0.3
+      },
+      "results": {
+        "fold_1": {
+          "train_period": "2026-04-26 to 2026-07-01",
+          "test_period": "2026-07-01 to 2026-07-17",
+          "test_win_rate": 0.2,
+          "test_sharpe": -20.472158658468015,
+          "test_sortino": -23.964968607860964,
+          "test_profit_factor": 0.20378386070744528,
+          "test_max_dd": -7.855949102019304,
+          "test_trades": 10,
+          "trades_per_week": 4.666666666666667,
+          "avg_trade_duration_hours": 0.0,
+          "train_accuracy": 0.5979381443298969,
+          "test_accuracy": 0.5,
+          "overfitting_detected": false,
+          "accuracy_gap": 0.09793814432989689,
+          "significance": {
+            "is_significant": false,
+            "p_value": 0.9892578125,
+            "confidence": "95%",
+            "wins": 2,
+            "n_trades": 10,
+            "win_rate": 0.2
+          },
+          "equity_end": 92145.2446455234,
+          "model_registration": {
+            "name": "EURUSD_random_forest",
+            "version": "20260717T230531Z",
+            "path": "ai/artifacts/phase5b/models/models/EURUSD_random_forest/20260717T230531Z",
+            "meta": {
+              "date": "2026-07-17T23:05:31.682529+00:00",
+              "metadata": {
+                "model_name": "EURUSD_random_forest",
+                "project": "eTradeAI",
+                "registered_at": "2026-07-17T23:05:31.620323+00:00"
+              },
+              "model_file": "model.joblib",
+              "params": {},
+              "version": "20260717T230531Z"
+            },
+            "metrics": {
+              "accuracy": 0.5979381443298969,
+              "best_metric": 0.4281284996344183,
+              "duration_seconds": 1.627460241317749,
+              "f1": 0.4281284996344183,
+              "test_accuracy": 0.6270190895741556,
+              "test_f1": 0.46470216874628634,
+              "val_accuracy": 0.5979381443298969,
+              "val_f1": 0.4281284996344183
+            },
+            "hashes": {
+              "features.json": "baaf768cf8646185904e9c73ee28b4aee6398631b91fa2ca2f38d84be60bed9e",
+              "meta.json": "e6fef88388c9189664c5d19d80eb79367c755ef4d17022b5f228a0d184c225a6",
+              "metrics.json": "432db737045e2511dfb7e7c602b82f8401d290d60d10838d1641daba819d0655",
+              "model.joblib": "094dfd21bb190c5d34471c855f32bc05b30ad3c5502f242022e0376552766376",
+              "scaler.json": "5e5640c9c438ddc049edf83c309057520444345ce42b91dcb51841af18da7a2e"
+            }
+          },
+          "feature_groups_active": [
+            "candle_structure",
+            "channels",
+            "correlation",
+            "microstructure",
+            "momentum",
+            "moving_averages",
+            "patterns",
+            "price",
+            "regime",
+            "returns",
+            "session",
+            "structure",
+            "volatility",
+            "volume"
+          ],
+          "generated_feature_groups": [
+            "price",
+            "moving_averages",
+            "momentum",
+            "volatility",
+            "volume",
+            "candle_structure",
+            "patterns",
+            "structure",
+            "session",
+            "regime",
+            "microstructure",
+            "correlation"
+          ],
+          "n_features": 479,
+          "peer_symbols": [
+            "SPX500",
+            "US10Y",
+            "US30",
+            "USDJPY",
+            "USOIL",
+            "XAUUSD"
+          ],
+          "model_params": {
+            "model_type": "random_forest",
+            "random_seed": 42
+          },
+          "feature_importance_top10": {
+            "log_return_1": 0.009147665336678929,
+            "price_body_pct": 0.007746499733895926,
+            "return_1": 0.007447674854169811,
+            "micro_ofi_zscore_20": 0.007262418431235528,
+            "micro_spread_change": 0.007218317306149822,
+            "candle_signed_body": 0.0067914623991433,
+            "micro_ofi_zscore_50": 0.0066285775213646295,
+            "micro_ofi_zscore_10": 0.00650402505390631,
+            "stochastic_spread_14_3": 0.006460006201180133,
+            "price_body": 0.0057518270063050755
+          }
+        }
+      },
+      "aggregate": {
+        "avg_win_rate": 0.2,
+        "std_win_rate": 0.0,
+        "avg_sharpe": -20.472158658468015,
+        "avg_sortino": -23.964968607860964,
+        "avg_profit_factor": 0.20378386070744528,
+        "avg_max_dd": -7.855949102019304,
+        "total_trades": 10,
+        "folds_significant": 0,
+        "overfitting_folds": 0,
+        "regime_stable": true,
+        "early_fold_sharpe": -20.472158658468015,
+        "late_fold_sharpe": -20.472158658468015,
+        "correlation_decay_per_fold": 0.0,
+        "overall_significant": false,
+        "pooled_significance": {
+          "is_significant": false,
+          "p_value": 0.9892578125,
+          "confidence": "95%",
+          "wins": 2,
+          "n_trades": 10,
+          "win_rate": 0.2
+        },
+        "failures": [
+          "win_rate_or_significance",
+          "sharpe",
+          "profit_factor"
+        ],
+        "recommendation": "NO ROBUST EDGE - Do NOT proceed to Phase 5b. Failed: win_rate_or_significance, sharpe, profit_factor. Suggestions: review labels/features, increase sample, reduce model complexity, re-check costs, or extend real history coverage.",
+        "symbol": "EURUSD",
+        "timeframe": "M15",
+        "multi_tf": false
+      }
+    },
+    {
+      "symbol": "EURUSD",
+      "timeframe": "H1",
+      "period": "2019-01-01 to 2024-12-31",
+      "actual_data_period": "2023-10-01 to 2024-12-31",
+      "train_folds": 1,
+      "multi_tf": false,
+      "advanced_features": true,
+      "feature_groups_active": [
+        "price",
+        "returns",
+        "moving_averages",
+        "momentum",
+        "volatility",
+        "channels",
+        "volume",
+        "candle_structure",
+        "patterns",
+        "structure",
+        "session",
+        "regime",
+        "microstructure",
+        "correlation"
+      ],
+      "peer_symbols_loaded": [
+        "SPX500",
+        "US10Y",
+        "US30",
+        "USDJPY",
+        "USOIL",
+        "XAUUSD"
+      ],
+      "data_snapshot": {
+        "timeframe": "H1",
+        "bars": 7716,
+        "start": "2023-10-01 23:00:00+00:00",
+        "end": "2024-12-31 00:00:00+00:00",
+        "source": "candle_repository_or_yahoo"
+      },
+      "costs": {
+        "slippage_pips": 2.0,
+        "commission_pips": 0.3
+      },
+      "results": {
+        "fold_1": {
+          "train_period": "2023-10-01 to 2024-09-30",
+          "test_period": "2024-09-30 to 2024-12-31",
+          "test_win_rate": 0.3333333333333333,
+          "test_sharpe": -7.94555454322966,
+          "test_sortino": -8.208345326972472,
+          "test_profit_factor": 0.3388258855413255,
+          "test_max_dd": -15.655027835057641,
+          "test_trades": 42,
+          "trades_per_week": 3.230769230769231,
+          "avg_trade_duration_hours": 0.0,
+          "train_accuracy": 0.534054054054054,
+          "test_accuracy": 0.5272727272727272,
+          "overfitting_detected": false,
+          "accuracy_gap": 0.006781326781326813,
+          "significance": {
+            "is_significant": false,
+            "p_value": 0.9902397636087699,
+            "confidence": "95%",
+            "wins": 14,
+            "n_trades": 42,
+            "win_rate": 0.3333333333333333
+          },
+          "equity_end": 85387.42446779448,
+          "model_registration": {
+            "name": "EURUSD_random_forest",
+            "version": "20260717T230604Z",
+            "path": "ai/artifacts/phase5b/models/models/EURUSD_random_forest/20260717T230604Z",
+            "meta": {
+              "date": "2026-07-17T23:06:04.234824+00:00",
+              "metadata": {
+                "model_name": "EURUSD_random_forest",
+                "project": "eTradeAI",
+                "registered_at": "2026-07-17T23:06:04.170490+00:00"
+              },
+              "model_file": "model.joblib",
+              "params": {},
+              "version": "20260717T230604Z"
+            },
+            "metrics": {
+              "accuracy": 0.534054054054054,
+              "best_metric": 0.3961857507864314,
+              "duration_seconds": 1.3184983730316162,
+              "f1": 0.3961857507864314,
+              "test_accuracy": 0.5512405609492989,
+              "test_f1": 0.3859050142682429,
+              "val_accuracy": 0.534054054054054,
+              "val_f1": 0.3961857507864314
+            },
+            "hashes": {
+              "features.json": "baaf768cf8646185904e9c73ee28b4aee6398631b91fa2ca2f38d84be60bed9e",
+              "meta.json": "e58651fa7444440d5be31b03a4fb9309608cb03c8415dc727aef6d2076faf975",
+              "metrics.json": "be74aae40d0c9b330635460663af41cbe34c0acde8aabbf7dfb25650ea08b79f",
+              "model.joblib": "a24e267ed453cdc5d0abe3c37aaa60fd4e1127bbb3fe5d3ed9f9c7405f111961",
+              "scaler.json": "5e5640c9c438ddc049edf83c309057520444345ce42b91dcb51841af18da7a2e"
+            }
+          },
+          "feature_groups_active": [
+            "candle_structure",
+            "channels",
+            "correlation",
+            "microstructure",
+            "momentum",
+            "moving_averages",
+            "patterns",
+            "price",
+            "regime",
+            "returns",
+            "session",
+            "structure",
+            "volatility",
+            "volume"
+          ],
+          "generated_feature_groups": [
+            "price",
+            "moving_averages",
+            "momentum",
+            "volatility",
+            "volume",
+            "candle_structure",
+            "patterns",
+            "structure",
+            "session",
+            "regime",
+            "microstructure",
+            "correlation"
+          ],
+          "n_features": 479,
+          "peer_symbols": [
+            "SPX500",
+            "US10Y",
+            "US30",
+            "USDJPY",
+            "USOIL",
+            "XAUUSD"
+          ],
+          "model_params": {
+            "model_type": "random_forest",
+            "random_seed": 42
+          },
+          "feature_importance_top10": {
+            "corr_usdjpy_relative_return": 0.007447563562247585,
+            "corr_class_equity_abs_50": 0.007225725492784137,
+            "session_close_location": 0.0068833385906034855,
+            "corr_us30_spread_zscore_50": 0.006269397251258457,
+            "regime_variance_ratio_20": 0.006239616644540457,
+            "micro_ofi_zscore_20": 0.005954539432824186,
+            "micro_spread_zscore_20": 0.005798773694487774,
+            "micro_spread": 0.0057752415726492305,
+            "ichimoku_cloud_width": 0.005744674206071304,
+            "micro_bid_ask_ratio_sma_20": 0.005717153063123097
+          }
+        }
+      },
+      "aggregate": {
+        "avg_win_rate": 0.3333333333333333,
+        "std_win_rate": 0.0,
+        "avg_sharpe": -7.94555454322966,
+        "avg_sortino": -8.208345326972472,
+        "avg_profit_factor": 0.3388258855413255,
+        "avg_max_dd": -15.655027835057641,
+        "total_trades": 42,
+        "folds_significant": 0,
+        "overfitting_folds": 0,
+        "regime_stable": true,
+        "early_fold_sharpe": -7.94555454322966,
+        "late_fold_sharpe": -7.94555454322966,
+        "correlation_decay_per_fold": 0.0,
+        "overall_significant": false,
+        "pooled_significance": {
+          "is_significant": false,
+          "p_value": 0.9902397636087699,
+          "confidence": "95%",
+          "wins": 14,
+          "n_trades": 42,
+          "win_rate": 0.3333333333333333
+        },
+        "failures": [
+          "win_rate_or_significance",
+          "sharpe",
+          "profit_factor",
+          "max_drawdown"
+        ],
+        "recommendation": "NO ROBUST EDGE - Do NOT proceed to Phase 5b. Failed: win_rate_or_significance, sharpe, profit_factor, max_drawdown. Suggestions: review labels/features, increase sample, reduce model complexity, re-check costs, or extend real history coverage.",
+        "symbol": "EURUSD",
+        "timeframe": "H1",
+        "multi_tf": false
+      }
+    },
+    {
+      "symbol": "EURUSD",
+      "timeframe": "H4",
+      "period": "2019-01-01 to 2024-12-31",
+      "actual_data_period": "2023-10-01 to 2024-12-31",
+      "train_folds": 1,
+      "multi_tf": false,
+      "advanced_features": true,
+      "feature_groups_active": [
+        "price",
+        "returns",
+        "moving_averages",
+        "momentum",
+        "volatility",
+        "channels",
+        "volume",
+        "candle_structure",
+        "patterns",
+        "structure",
+        "session",
+        "regime",
+        "microstructure",
+        "correlation"
+      ],
+      "peer_symbols_loaded": [
+        "SPX500",
+        "US10Y",
+        "US30",
+        "USDJPY",
+        "USOIL",
+        "XAUUSD"
+      ],
+      "data_snapshot": {
+        "timeframe": "H4",
+        "bars": 1983,
+        "start": "2023-10-01 20:00:00+00:00",
+        "end": "2024-12-31 00:00:00+00:00",
+        "source": "candle_repository_or_yahoo"
+      },
+      "costs": {
+        "slippage_pips": 2.0,
+        "commission_pips": 0.3
+      },
+      "results": {
+        "fold_1": {
+          "train_period": "2023-10-01 to 2024-09-30",
+          "test_period": "2024-09-30 to 2024-12-31",
+          "test_win_rate": 0.2727272727272727,
+          "test_sharpe": -3.8049873551087616,
+          "test_sortino": -3.5394748113388617,
+          "test_profit_factor": 0.3222942091697522,
+          "test_max_dd": -10.961832418243764,
+          "test_trades": 22,
+          "trades_per_week": 1.6923076923076923,
+          "avg_trade_duration_hours": 0.0,
+          "train_accuracy": 0.48945147679324896,
+          "test_accuracy": 0.5551724137931034,
+          "overfitting_detected": false,
+          "accuracy_gap": -0.06572093699985448,
+          "significance": {
+            "is_significant": false,
+            "p_value": 0.9915497303009033,
+            "confidence": "95%",
+            "wins": 6,
+            "n_trades": 22,
+            "win_rate": 0.2727272727272727
+          },
+          "equity_end": 89432.74111913351,
+          "model_registration": {
+            "name": "EURUSD_random_forest",
+            "version": "20260717T230700Z",
+            "path": "ai/artifacts/phase5b/models/models/EURUSD_random_forest/20260717T230700Z",
+            "meta": {
+              "date": "2026-07-17T23:07:00.564276+00:00",
+              "metadata": {
+                "model_name": "EURUSD_random_forest",
+                "project": "eTradeAI",
+                "registered_at": "2026-07-17T23:07:00.507811+00:00"
+              },
+              "model_file": "model.joblib",
+              "params": {},
+              "version": "20260717T230700Z"
+            },
+            "metrics": {
+              "accuracy": 0.48945147679324896,
+              "best_metric": 0.4822244289970209,
+              "duration_seconds": 0.5674436092376709,
+              "f1": 0.4822244289970209,
+              "test_accuracy": 0.5104602510460251,
+              "test_f1": 0.41151587852768484,
+              "val_accuracy": 0.48945147679324896,
+              "val_f1": 0.4822244289970209
+            },
+            "hashes": {
+              "features.json": "baaf768cf8646185904e9c73ee28b4aee6398631b91fa2ca2f38d84be60bed9e",
+              "meta.json": "93cee12ec718ca5850f0e79a69bf19aa08da65c6db5ee27c7cfdfb2ed5686c9a",
+              "metrics.json": "a3db6b1aff4c4dca911cc113e073d33e849c68b39ab998d2a52e361e7fa4af61",
+              "model.joblib": "2a816ca4146f9724078b03dc93c808c27cf6f86fc0e51fd1b1702eed14e01432",
+              "scaler.json": "5e5640c9c438ddc049edf83c309057520444345ce42b91dcb51841af18da7a2e"
+            }
+          },
+          "feature_groups_active": [
+            "candle_structure",
+            "channels",
+            "correlation",
+            "microstructure",
+            "momentum",
+            "moving_averages",
+            "patterns",
+            "price",
+            "regime",
+            "returns",
+            "session",
+            "structure",
+            "volatility",
+            "volume"
+          ],
+          "generated_feature_groups": [
+            "price",
+            "moving_averages",
+            "momentum",
+            "volatility",
+            "volume",
+            "candle_structure",
+            "patterns",
+            "structure",
+            "session",
+            "regime",
+            "microstructure",
+            "correlation"
+          ],
+          "n_features": 479,
+          "peer_symbols": [
+            "SPX500",
+            "US10Y",
+            "US30",
+            "USDJPY",
+            "USOIL",
+            "XAUUSD"
+          ],
+          "model_params": {
+            "model_type": "random_forest",
+            "random_seed": 42
+          },
+          "feature_importance_top10": {
+            "micro_buy_sell_ratio_10": 0.01452942280259417,
+            "micro_ofi_sma_10": 0.0096416046998503,
+            "ichimoku_cloud_width": 0.006740896650440079,
+            "micro_spread_volatility_5": 0.006739552677535618,
+            "micro_ofi_sma_5": 0.006567856892155429,
+            "structure_trend_strength_20": 0.005979770426784711,
+            "rolling_std_log_return_10": 0.00559717579647206,
+            "candle_lower_wick_ratio": 0.005406136573763639,
+            "corr_us30_beta_50": 0.005342111704454741,
+            "adx_14": 0.005325987810541597
+          }
+        }
+      },
+      "aggregate": {
+        "avg_win_rate": 0.2727272727272727,
+        "std_win_rate": 0.0,
+        "avg_sharpe": -3.8049873551087616,
+        "avg_sortino": -3.5394748113388617,
+        "avg_profit_factor": 0.3222942091697522,
+        "avg_max_dd": -10.961832418243764,
+        "total_trades": 22,
+        "folds_significant": 0,
+        "overfitting_folds": 0,
+        "regime_stable": true,
+        "early_fold_sharpe": -3.8049873551087616,
+        "late_fold_sharpe": -3.8049873551087616,
+        "correlation_decay_per_fold": 0.0,
+        "overall_significant": false,
+        "pooled_significance": {
+          "is_significant": false,
+          "p_value": 0.9915497303009033,
+          "confidence": "95%",
+          "wins": 6,
+          "n_trades": 22,
+          "win_rate": 0.2727272727272727
+        },
+        "failures": [
+          "win_rate_or_significance",
+          "sharpe",
+          "profit_factor"
+        ],
+        "recommendation": "NO ROBUST EDGE - Do NOT proceed to Phase 5b. Failed: win_rate_or_significance, sharpe, profit_factor. Suggestions: review labels/features, increase sample, reduce model complexity, re-check costs, or extend real history coverage.",
+        "symbol": "EURUSD",
+        "timeframe": "H4",
+        "multi_tf": false
+      }
+    },
+    {
+      "symbol": "EURUSD",
+      "timeframe": "D1",
+      "period": "2019-01-01 to 2024-12-31",
+      "actual_data_period": "2019-01-01 to 2024-12-31",
+      "train_folds": 2,
+      "multi_tf": false,
+      "advanced_features": true,
+      "feature_groups_active": [
+        "price",
+        "returns",
+        "moving_averages",
+        "momentum",
+        "volatility",
+        "channels",
+        "volume",
+        "candle_structure",
+        "patterns",
+        "structure",
+        "session",
+        "regime",
+        "microstructure",
+        "correlation"
+      ],
+      "peer_symbols_loaded": [
+        "SPX500",
+        "US10Y",
+        "US30",
+        "USDJPY",
+        "USOIL",
+        "XAUUSD"
+      ],
+      "data_snapshot": {
+        "timeframe": "D1",
+        "bars": 1565,
+        "start": "2019-01-01 00:00:00+00:00",
+        "end": "2024-12-31 00:00:00+00:00",
+        "source": "candle_repository_or_yahoo"
+      },
+      "costs": {
+        "slippage_pips": 2.0,
+        "commission_pips": 0.3
+      },
+      "results": {
+        "fold_1": {
+          "train_period": "2019-01-01 to 2022-11-11",
+          "test_period": "2022-11-14 to 2023-10-31",
+          "test_win_rate": 0.5,
+          "test_sharpe": 0.05655799977068672,
+          "test_sortino": 0.08229652775037959,
+          "test_profit_factor": 1.3646147808597644,
+          "test_max_dd": -5.379697868938068,
+          "test_trades": 10,
+          "trades_per_week": 0.1994301994301994,
+          "avg_trade_duration_hours": 0.0,
+          "train_accuracy": 0.7748344370860927,
+          "test_accuracy": 0.7569444444444444,
+          "overfitting_detected": false,
+          "accuracy_gap": 0.017889992641648256,
+          "significance": {
+            "is_significant": false,
+            "p_value": 0.623046875,
+            "confidence": "95%",
+            "wins": 5,
+            "n_trades": 10,
+            "win_rate": 0.5
+          },
+          "equity_end": 102180.30999778272,
+          "model_registration": {
+            "name": "EURUSD_random_forest",
+            "version": "20260717T230728Z",
+            "path": "ai/artifacts/phase5b/models/models/EURUSD_random_forest/20260717T230728Z",
+            "meta": {
+              "date": "2026-07-17T23:07:28.742820+00:00",
+              "metadata": {
+                "model_name": "EURUSD_random_forest",
+                "project": "eTradeAI",
+                "registered_at": "2026-07-17T23:07:28.687389+00:00"
+              },
+              "model_file": "model.joblib",
+              "params": {},
+              "version": "20260717T230728Z"
+            },
+            "metrics": {
+              "accuracy": 0.7748344370860927,
+              "best_metric": 0.7748245614035087,
+              "duration_seconds": 0.44646191596984863,
+              "f1": 0.7748245614035087,
+              "test_accuracy": 0.8421052631578947,
+              "test_f1": 0.8407543216343635,
+              "val_accuracy": 0.7748344370860927,
+              "val_f1": 0.7748245614035087
+            },
+            "hashes": {
+              "features.json": "baaf768cf8646185904e9c73ee28b4aee6398631b91fa2ca2f38d84be60bed9e",
+              "meta.json": "49d3641541ca79f9ebf2f599806fece825d5bc88d9857f2f0aab6aa4747e5f63",
+              "metrics.json": "fc257a45b74e67b9dafaf61a0a5944b504ada17e3c480d7490d23d1100f48b87",
+              "model.joblib": "04d244d620bfbfaa8bb94a5e0e59d93771f841dff10ee31ab5394bbc2ae2602f",
+              "scaler.json": "5e5640c9c438ddc049edf83c309057520444345ce42b91dcb51841af18da7a2e"
+            }
+          },
+          "feature_groups_active": [
+            "candle_structure",
+            "channels",
+            "correlation",
+            "microstructure",
+            "momentum",
+            "moving_averages",
+            "patterns",
+            "price",
+            "regime",
+            "returns",
+            "session",
+            "structure",
+            "volatility",
+            "volume"
+          ],
+          "generated_feature_groups": [
+            "price",
+            "moving_averages",
+            "momentum",
+            "volatility",
+            "volume",
+            "candle_structure",
+            "patterns",
+            "structure",
+            "session",
+            "regime",
+            "microstructure",
+            "correlation"
+          ],
+          "n_features": 479,
+          "peer_symbols": [
+            "SPX500",
+            "US10Y",
+            "US30",
+            "USDJPY",
+            "USOIL",
+            "XAUUSD"
+          ],
+          "model_params": {
+            "model_type": "random_forest",
+            "random_seed": 42
+          },
+          "feature_importance_top10": {
+            "micro_sell_volume": 0.06017586280357947,
+            "candle_lower_wick_ratio": 0.046644394469774725,
+            "micro_clv": 0.044778685796334525,
+            "candle_close_location": 0.041206798525486615,
+            "micro_buy_volume": 0.03962943677252228,
+            "micro_order_flow_imbalance": 0.038391783090893715,
+            "candle_upper_wick_ratio": 0.03655155739601192,
+            "candle_open_location": 0.034408274339636925,
+            "micro_bid_ask_ratio": 0.032143541494113914,
+            "price_close_position": 0.02813450573957211
+          }
+        },
+        "fold_2": {
+          "train_period": "2019-12-20 to 2023-10-31",
+          "test_period": "2023-11-01 to 2024-10-17",
+          "test_win_rate": 0.5454545454545454,
+          "test_sharpe": 0.7418756868868134,
+          "test_sortino": 1.104417233161817,
+          "test_profit_factor": 2.1210213212915376,
+          "test_max_dd": -3.0271755317523557,
+          "test_trades": 11,
+          "trades_per_week": 0.21937321937321935,
+          "avg_trade_duration_hours": 0.0,
+          "train_accuracy": 0.7814569536423841,
+          "test_accuracy": 0.776,
+          "overfitting_detected": false,
+          "accuracy_gap": 0.005456953642384077,
+          "significance": {
+            "is_significant": false,
+            "p_value": 0.5,
+            "confidence": "95%",
+            "wins": 6,
+            "n_trades": 11,
+            "win_rate": 0.5454545454545454
+          },
+          "equity_end": 106082.27614970769,
+          "model_registration": {
+            "name": "EURUSD_random_forest",
+            "version": "20260717T230746Z",
+            "path": "ai/artifacts/phase5b/models/models/EURUSD_random_forest/20260717T230746Z",
+            "meta": {
+              "date": "2026-07-17T23:07:46.382764+00:00",
+              "metadata": {
+                "model_name": "EURUSD_random_forest",
+                "project": "eTradeAI",
+                "registered_at": "2026-07-17T23:07:46.327459+00:00"
+              },
+              "model_file": "model.joblib",
+              "params": {},
+              "version": "20260717T230746Z"
+            },
+            "metrics": {
+              "accuracy": 0.7814569536423841,
+              "best_metric": 0.775793025871766,
+              "duration_seconds": 0.4570584297180176,
+              "f1": 0.775793025871766,
+              "test_accuracy": 0.7828947368421053,
+              "test_f1": 0.7828101320632171,
+              "val_accuracy": 0.7814569536423841,
+              "val_f1": 0.775793025871766
+            },
+            "hashes": {
+              "features.json": "baaf768cf8646185904e9c73ee28b4aee6398631b91fa2ca2f38d84be60bed9e",
+              "meta.json": "c027a734d4be232098219b55aef31067444db48368b278068afc6db3c45e6b75",
+              "metrics.json": "ad6545f6446a05423d4496fa7f6b921aef38951df8105b81b529cc085ddef0e0",
+              "model.joblib": "7d88449239392bf77c7d8762d270614184f301e9d45a89b859f966485532dc2f",
+              "scaler.json": "5e5640c9c438ddc049edf83c309057520444345ce42b91dcb51841af18da7a2e"
+            }
+          },
+          "feature_groups_active": [
+            "candle_structure",
+            "channels",
+            "correlation",
+            "microstructure",
+            "momentum",
+            "moving_averages",
+            "patterns",
+            "price",
+            "regime",
+            "returns",
+            "session",
+            "structure",
+            "volatility",
+            "volume"
+          ],
+          "generated_feature_groups": [
+            "price",
+            "moving_averages",
+            "momentum",
+            "volatility",
+            "volume",
+            "candle_structure",
+            "patterns",
+            "structure",
+            "session",
+            "regime",
+            "microstructure",
+            "correlation"
+          ],
+          "n_features": 479,
+          "peer_symbols": [
+            "SPX500",
+            "US10Y",
+            "US30",
+            "USDJPY",
+            "USOIL",
+            "XAUUSD"
+          ],
+          "model_params": {
+            "model_type": "random_forest",
+            "random_seed": 42
+          },
+          "feature_importance_top10": {
+            "micro_sell_volume": 0.05535867168480528,
+            "micro_clv": 0.04611142100363288,
+            "candle_lower_wick_ratio": 0.04288845215709028,
+            "micro_buy_volume": 0.0425074230439679,
+            "pattern_directional_score": 0.038976616550700144,
+            "micro_bid_ask_ratio": 0.038940785867489225,
+            "candle_upper_wick_ratio": 0.037924980840286115,
+            "candle_open_location": 0.036985376914602866,
+            "micro_order_flow_imbalance": 0.03625181950917068,
+            "candle_close_location": 0.0348406748587721
+          }
+        }
+      },
+      "aggregate": {
+        "avg_win_rate": 0.5227272727272727,
+        "std_win_rate": 0.022727272727272707,
+        "avg_sharpe": 0.39921684332875007,
+        "avg_sortino": 0.5933568804560982,
+        "avg_profit_factor": 1.742818051075651,
+        "avg_max_dd": -4.203436700345212,
+        "total_trades": 21,
+        "folds_significant": 0,
+        "overfitting_folds": 0,
+        "regime_stable": true,
+        "early_fold_sharpe": 0.05655799977068672,
+        "late_fold_sharpe": 0.7418756868868134,
+        "correlation_decay_per_fold": -0.016565454602486936,
+        "overall_significant": false,
+        "pooled_significance": {
+          "is_significant": false,
+          "p_value": 0.5,
+          "confidence": "95%",
+          "wins": 11,
+          "n_trades": 21,
+          "win_rate": 0.5227272727272727
+        },
+        "failures": [
+          "win_rate_or_significance",
+          "sharpe"
+        ],
+        "recommendation": "NO ROBUST EDGE - Do NOT proceed to Phase 5b. Failed: win_rate_or_significance, sharpe. Suggestions: review labels/features, increase sample, reduce model complexity, re-check costs, or extend real history coverage.",
+        "symbol": "EURUSD",
+        "timeframe": "D1",
+        "multi_tf": false
+      }
+    },
+    {
+      "symbol": "EURUSD",
+      "timeframe": "M15+H1+H4",
+      "period": "2019-01-01 to 2024-12-31",
+      "actual_data_period": "2026-04-26 to 2026-07-17",
+      "train_folds": 1,
+      "multi_tf": true,
+      "advanced_features": true,
+      "feature_groups_active": [
+        "price",
+        "returns",
+        "moving_averages",
+        "momentum",
+        "volatility",
+        "channels",
+        "volume",
+        "candle_structure",
+        "patterns",
+        "structure",
+        "session",
+        "regime",
+        "microstructure",
+        "correlation"
+      ],
+      "peer_symbols_loaded": [
+        "SPX500",
+        "US10Y",
+        "US30",
+        "USDJPY",
+        "USOIL",
+        "XAUUSD"
+      ],
+      "data_snapshot": {
+        "timeframe": "M15",
+        "bars": 5666,
+        "start": "2026-04-26 23:00:00+00:00",
+        "end": "2026-07-17 21:15:00+00:00",
+        "source": "candle_repository_or_yahoo"
+      },
+      "costs": {
+        "slippage_pips": 2.0,
+        "commission_pips": 0.3
+      },
+      "results": {
+        "fold_1": {
+          "train_period": "2026-04-26 to 2026-07-01",
+          "test_period": "2026-07-01 to 2026-07-17",
+          "test_win_rate": 0.2,
+          "test_sharpe": -20.472158658468015,
+          "test_sortino": -23.964968607860964,
+          "test_profit_factor": 0.20378386070744528,
+          "test_max_dd": -7.855949102019304,
+          "test_trades": 10,
+          "trades_per_week": 4.666666666666667,
+          "avg_trade_duration_hours": 0.0,
+          "train_accuracy": 0.5979381443298969,
+          "test_accuracy": 0.5,
+          "overfitting_detected": false,
+          "accuracy_gap": 0.09793814432989689,
+          "significance": {
+            "is_significant": false,
+            "p_value": 0.9892578125,
+            "confidence": "95%",
+            "wins": 2,
+            "n_trades": 10,
+            "win_rate": 0.2
+          },
+          "equity_end": 92145.2446455234,
+          "model_registration": {
+            "name": "EURUSD_random_forest",
+            "version": "20260717T230811Z",
+            "path": "ai/artifacts/phase5b/models/models/EURUSD_random_forest/20260717T230811Z",
+            "meta": {
+              "date": "2026-07-17T23:08:11.202172+00:00",
+              "metadata": {
+                "model_name": "EURUSD_random_forest",
+                "project": "eTradeAI",
+                "registered_at": "2026-07-17T23:08:11.140410+00:00"
+              },
+              "model_file": "model.joblib",
+              "params": {},
+              "version": "20260717T230811Z"
+            },
+            "metrics": {
+              "accuracy": 0.5979381443298969,
+              "best_metric": 0.4281284996344183,
+              "duration_seconds": 1.005707025527954,
+              "f1": 0.4281284996344183,
+              "test_accuracy": 0.6270190895741556,
+              "test_f1": 0.46470216874628634,
+              "val_accuracy": 0.5979381443298969,
+              "val_f1": 0.4281284996344183
+            },
+            "hashes": {
+              "features.json": "baaf768cf8646185904e9c73ee28b4aee6398631b91fa2ca2f38d84be60bed9e",
+              "meta.json": "9668bf00944e61a55c7e7a898f8df7a3e1a213efc26f32c404f634ecb97122c3",
+              "metrics.json": "4e1d5285760063d899d413355b1002e876cb978ef88ac0cfa9675c4c39e679a0",
+              "model.joblib": "860f8332370236b906df23fb12554d35348605e579f162ea6bf5258fe10354dc",
+              "scaler.json": "5e5640c9c438ddc049edf83c309057520444345ce42b91dcb51841af18da7a2e"
+            }
+          },
+          "feature_groups_active": [
+            "candle_structure",
+            "channels",
+            "correlation",
+            "microstructure",
+            "momentum",
+            "moving_averages",
+            "patterns",
+            "price",
+            "regime",
+            "returns",
+            "session",
+            "structure",
+            "volatility",
+            "volume"
+          ],
+          "generated_feature_groups": [
+            "price",
+            "moving_averages",
+            "momentum",
+            "volatility",
+            "volume",
+            "candle_structure",
+            "patterns",
+            "structure",
+            "session",
+            "regime",
+            "microstructure",
+            "correlation"
+          ],
+          "n_features": 479,
+          "peer_symbols": [
+            "SPX500",
+            "US10Y",
+            "US30",
+            "USDJPY",
+            "USOIL",
+            "XAUUSD"
+          ],
+          "model_params": {
+            "model_type": "random_forest",
+            "random_seed": 42
+          },
+          "feature_importance_top10": {
+            "log_return_1": 0.009147665336678929,
+            "price_body_pct": 0.007746499733895926,
+            "return_1": 0.007447674854169811,
+            "micro_ofi_zscore_20": 0.007262418431235528,
+            "micro_spread_change": 0.007218317306149822,
+            "candle_signed_body": 0.0067914623991433,
+            "micro_ofi_zscore_50": 0.0066285775213646295,
+            "micro_ofi_zscore_10": 0.00650402505390631,
+            "stochastic_spread_14_3": 0.006460006201180133,
+            "price_body": 0.0057518270063050755
+          }
+        }
+      },
+      "aggregate": {
+        "avg_win_rate": 0.2,
+        "std_win_rate": 0.0,
+        "avg_sharpe": -20.472158658468015,
+        "avg_sortino": -23.964968607860964,
+        "avg_profit_factor": 0.20378386070744528,
+        "avg_max_dd": -7.855949102019304,
+        "total_trades": 10,
+        "folds_significant": 0,
+        "overfitting_folds": 0,
+        "regime_stable": true,
+        "early_fold_sharpe": -20.472158658468015,
+        "late_fold_sharpe": -20.472158658468015,
+        "correlation_decay_per_fold": 0.0,
+        "overall_significant": false,
+        "pooled_significance": {
+          "is_significant": false,
+          "p_value": 0.9892578125,
+          "confidence": "95%",
+          "wins": 2,
+          "n_trades": 10,
+          "win_rate": 0.2
+        },
+        "failures": [
+          "win_rate_or_significance",
+          "sharpe",
+          "profit_factor"
+        ],
+        "recommendation": "NO ROBUST EDGE - Do NOT proceed to Phase 5b. Failed: win_rate_or_significance, sharpe, profit_factor. Suggestions: review labels/features, increase sample, reduce model complexity, re-check costs, or extend real history coverage.",
+        "symbol": "EURUSD",
+        "timeframe": "M15",
+        "multi_tf": true
+      }
+    },
+    {
+      "symbol": "GBPUSD",
+      "timeframe": "M15",
+      "period": "2019-01-01 to 2024-12-31",
+      "actual_data_period": "2026-04-26 to 2026-07-17",
+      "train_folds": 1,
+      "multi_tf": false,
+      "advanced_features": true,
+      "feature_groups_active": [
+        "price",
+        "returns",
+        "moving_averages",
+        "momentum",
+        "volatility",
+        "channels",
+        "volume",
+        "candle_structure",
+        "patterns",
+        "structure",
+        "session",
+        "regime",
+        "microstructure",
+        "correlation"
+      ],
+      "peer_symbols_loaded": [
+        "SPX500",
+        "US10Y",
+        "US30",
+        "USDJPY",
+        "USOIL",
+        "XAUUSD"
+      ],
+      "data_snapshot": {
+        "timeframe": "M15",
+        "bars": 5666,
+        "start": "2026-04-26 23:00:00+00:00",
+        "end": "2026-07-17 21:15:00+00:00",
+        "source": "candle_repository_or_yahoo"
+      },
+      "costs": {
+        "slippage_pips": 2.0,
+        "commission_pips": 0.3
+      },
+      "results": {
+        "fold_1": {
+          "train_period": "2026-04-26 to 2026-07-01",
+          "test_period": "2026-07-01 to 2026-07-17",
+          "test_win_rate": 0.4722222222222222,
+          "test_sharpe": -3.306888044858257,
+          "test_sortino": -4.83357667810452,
+          "test_profit_factor": 0.8903327922700881,
+          "test_max_dd": -9.258465294792567,
+          "test_trades": 36,
+          "trades_per_week": 16.8,
+          "avg_trade_duration_hours": 0.0,
+          "train_accuracy": 0.48748159057437407,
+          "test_accuracy": 0.5428571428571428,
+          "overfitting_detected": false,
+          "accuracy_gap": -0.05537555228276875,
+          "significance": {
+            "is_significant": false,
+            "p_value": 0.691140341485152,
+            "confidence": "95%",
+            "wins": 17,
+            "n_trades": 36,
+            "win_rate": 0.4722222222222222
+          },
+          "equity_end": 96814.06908253247,
+          "model_registration": {
+            "name": "GBPUSD_random_forest",
+            "version": "20260717T230901Z",
+            "path": "ai/artifacts/phase5b/models/models/GBPUSD_random_forest/20260717T230901Z",
+            "meta": {
+              "date": "2026-07-17T23:09:01.158748+00:00",
+              "metadata": {
+                "model_name": "GBPUSD_random_forest",
+                "project": "eTradeAI",
+                "registered_at": "2026-07-17T23:09:01.099411+00:00"
+              },
+              "model_file": "model.joblib",
+              "params": {},
+              "version": "20260717T230901Z"
+            },
+            "metrics": {
+              "accuracy": 0.48748159057437407,
+              "best_metric": 0.47680412371134023,
+              "duration_seconds": 1.0585205554962158,
+              "f1": 0.47680412371134023,
+              "test_accuracy": 0.5051395007342144,
+              "test_f1": 0.49035209469137586,
+              "val_accuracy": 0.48748159057437407,
+              "val_f1": 0.47680412371134023
+            },
+            "hashes": {
+              "features.json": "baaf768cf8646185904e9c73ee28b4aee6398631b91fa2ca2f38d84be60bed9e",
+              "meta.json": "566fdeef3cd5d6c75db4e4ea9d723df755a3190f79329843f152ebc97b11b295",
+              "metrics.json": "f39aa7867de70b5c4001fd887de7ed75946ae15b639847d55ebc437e6b2e098d",
+              "model.joblib": "97aef2d7c1eb3e8ac0e0b82a71a5dc430faadd46cb5f9871f6dacca6d3a670fc",
+              "scaler.json": "5e5640c9c438ddc049edf83c309057520444345ce42b91dcb51841af18da7a2e"
+            }
+          },
+          "feature_groups_active": [
+            "candle_structure",
+            "channels",
+            "correlation",
+            "microstructure",
+            "momentum",
+            "moving_averages",
+            "patterns",
+            "price",
+            "regime",
+            "returns",
+            "session",
+            "structure",
+            "volatility",
+            "volume"
+          ],
+          "generated_feature_groups": [
+            "price",
+            "moving_averages",
+            "momentum",
+            "volatility",
+            "volume",
+            "candle_structure",
+            "patterns",
+            "structure",
+            "session",
+            "regime",
+            "microstructure",
+            "correlation"
+          ],
+          "n_features": 479,
+          "peer_symbols": [
+            "SPX500",
+            "US10Y",
+            "US30",
+            "USDJPY",
+            "USOIL",
+            "XAUUSD"
+          ],
+          "model_params": {
+            "model_type": "random_forest",
+            "random_seed": 42
+          },
+          "feature_importance_top10": {
+            "micro_spread_zscore_20": 0.0075353798683639095,
+            "micro_ofi_zscore_10": 0.007000183960358808,
+            "corr_usdjpy_beta_50": 0.0064497601527787685,
+            "corr_class_fx_abs_50": 0.006358762448499179,
+            "sma_spread_100_200": 0.005836969512419668,
+            "corr_class_fx_50": 0.005690280835746273,
+            "corr_spx500_relative_return": 0.0055343880214544575,
+            "corr_usdjpy_relative_return": 0.005329272807141456,
+            "micro_spread_sma_50": 0.005265142472840734,
+            "return_open_close": 0.005254578765606493
+          }
+        }
+      },
+      "aggregate": {
+        "avg_win_rate": 0.4722222222222222,
+        "std_win_rate": 0.0,
+        "avg_sharpe": -3.306888044858257,
+        "avg_sortino": -4.83357667810452,
+        "avg_profit_factor": 0.8903327922700881,
+        "avg_max_dd": -9.258465294792567,
+        "total_trades": 36,
+        "folds_significant": 0,
+        "overfitting_folds": 0,
+        "regime_stable": true,
+        "early_fold_sharpe": -3.306888044858257,
+        "late_fold_sharpe": -3.306888044858257,
+        "correlation_decay_per_fold": 0.0,
+        "overall_significant": false,
+        "pooled_significance": {
+          "is_significant": false,
+          "p_value": 0.691140341485152,
+          "confidence": "95%",
+          "wins": 17,
+          "n_trades": 36,
+          "win_rate": 0.4722222222222222
+        },
+        "failures": [
+          "win_rate_or_significance",
+          "sharpe",
+          "profit_factor"
+        ],
+        "recommendation": "NO ROBUST EDGE - Do NOT proceed to Phase 5b. Failed: win_rate_or_significance, sharpe, profit_factor. Suggestions: review labels/features, increase sample, reduce model complexity, re-check costs, or extend real history coverage.",
+        "symbol": "GBPUSD",
+        "timeframe": "M15",
+        "multi_tf": false
+      }
+    },
+    {
+      "symbol": "GBPUSD",
+      "timeframe": "H1",
+      "period": "2019-01-01 to 2024-12-31",
+      "actual_data_period": "2023-10-01 to 2024-12-31",
+      "train_folds": 1,
+      "multi_tf": false,
+      "advanced_features": true,
+      "feature_groups_active": [
+        "price",
+        "returns",
+        "moving_averages",
+        "momentum",
+        "volatility",
+        "channels",
+        "volume",
+        "candle_structure",
+        "patterns",
+        "structure",
+        "session",
+        "regime",
+        "microstructure",
+        "correlation"
+      ],
+      "peer_symbols_loaded": [
+        "SPX500",
+        "US10Y",
+        "US30",
+        "USDJPY",
+        "USOIL",
+        "XAUUSD"
+      ],
+      "data_snapshot": {
+        "timeframe": "H1",
+        "bars": 7717,
+        "start": "2023-10-01 23:00:00+00:00",
+        "end": "2024-12-31 00:00:00+00:00",
+        "source": "candle_repository_or_yahoo"
+      },
+      "costs": {
+        "slippage_pips": 2.0,
+        "commission_pips": 0.3
+      },
+      "results": {
+        "fold_1": {
+          "train_period": "2023-10-01 to 2024-09-30",
+          "test_period": "2024-09-30 to 2024-12-31",
+          "test_win_rate": 0.4305555555555556,
+          "test_sharpe": -5.111102797822577,
+          "test_sortino": -5.330852841840575,
+          "test_profit_factor": 0.6064989898219004,
+          "test_max_dd": -13.40658664482876,
+          "test_trades": 72,
+          "trades_per_week": 5.538461538461538,
+          "avg_trade_duration_hours": 0.0,
+          "train_accuracy": 0.49405405405405406,
+          "test_accuracy": 0.5633333333333334,
+          "overfitting_detected": false,
+          "accuracy_gap": -0.0692792792792793,
+          "significance": {
+            "is_significant": false,
+            "p_value": 0.9027474170663005,
+            "confidence": "95%",
+            "wins": 31,
+            "n_trades": 72,
+            "win_rate": 0.4305555555555556
+          },
+          "equity_end": 87750.1536994065,
+          "model_registration": {
+            "name": "GBPUSD_random_forest",
+            "version": "20260717T230932Z",
+            "path": "ai/artifacts/phase5b/models/models/GBPUSD_random_forest/20260717T230932Z",
+            "meta": {
+              "date": "2026-07-17T23:09:32.877472+00:00",
+              "metadata": {
+                "model_name": "GBPUSD_random_forest",
+                "project": "eTradeAI",
+                "registered_at": "2026-07-17T23:09:32.814235+00:00"
+              },
+              "model_file": "model.joblib",
+              "params": {},
+              "version": "20260717T230932Z"
+            },
+            "metrics": {
+              "accuracy": 0.49405405405405406,
+              "best_metric": 0.48130841121495327,
+              "duration_seconds": 1.360090732574463,
+              "f1": 0.48130841121495327,
+              "test_accuracy": 0.48975188781014023,
+              "test_f1": 0.43182115631070106,
+              "val_accuracy": 0.49405405405405406,
+              "val_f1": 0.48130841121495327
+            },
+            "hashes": {
+              "features.json": "baaf768cf8646185904e9c73ee28b4aee6398631b91fa2ca2f38d84be60bed9e",
+              "meta.json": "62406690f908144139d8a064e16881352cd5e953567e22c24117910d3eef6200",
+              "metrics.json": "4f7a6c77716a390f467705b6f56e564c6a4897e15774833c53c9d7c151f9be20",
+              "model.joblib": "b1bf404d47ed13ae76f352235347812d912871048701ad4c5a125a8744d7b67c",
+              "scaler.json": "5e5640c9c438ddc049edf83c309057520444345ce42b91dcb51841af18da7a2e"
+            }
+          },
+          "feature_groups_active": [
+            "candle_structure",
+            "channels",
+            "correlation",
+            "microstructure",
+            "momentum",
+            "moving_averages",
+            "patterns",
+            "price",
+            "regime",
+            "returns",
+            "session",
+            "structure",
+            "volatility",
+            "volume"
+          ],
+          "generated_feature_groups": [
+            "price",
+            "moving_averages",
+            "momentum",
+            "volatility",
+            "volume",
+            "candle_structure",
+            "patterns",
+            "structure",
+            "session",
+            "regime",
+            "microstructure",
+            "correlation"
+          ],
+          "n_features": 479,
+          "peer_symbols": [
+            "SPX500",
+            "US10Y",
+            "US30",
+            "USDJPY",
+            "USOIL",
+            "XAUUSD"
+          ],
+          "model_params": {
+            "model_type": "random_forest",
+            "random_seed": 42
+          },
+          "feature_importance_top10": {
+            "regime_efficiency_ratio_10": 0.006612541411532618,
+            "candle_body_ratio": 0.005964469378552831,
+            "price_gap_pct": 0.005812756770178476,
+            "micro_bid_ask_ratio_sma_5": 0.005717388605252483,
+            "regime_efficiency_ratio_50": 0.00571443836587471,
+            "regime_variance_ratio_5": 0.005552042476587518,
+            "corr_usdjpy_relative_return": 0.0055451482294916,
+            "session_return": 0.0054984157821900415,
+            "micro_bid_ask_ratio": 0.0053677889255400865,
+            "micro_ofi_zscore_10": 0.005127802143243026
+          }
+        }
+      },
+      "aggregate": {
+        "avg_win_rate": 0.4305555555555556,
+        "std_win_rate": 0.0,
+        "avg_sharpe": -5.111102797822577,
+        "avg_sortino": -5.330852841840575,
+        "avg_profit_factor": 0.6064989898219004,
+        "avg_max_dd": -13.40658664482876,
+        "total_trades": 72,
+        "folds_significant": 0,
+        "overfitting_folds": 0,
+        "regime_stable": true,
+        "early_fold_sharpe": -5.111102797822577,
+        "late_fold_sharpe": -5.111102797822577,
+        "correlation_decay_per_fold": 0.0,
+        "overall_significant": false,
+        "pooled_significance": {
+          "is_significant": false,
+          "p_value": 0.9027474170663005,
+          "confidence": "95%",
+          "wins": 31,
+          "n_trades": 72,
+          "win_rate": 0.4305555555555556
+        },
+        "failures": [
+          "win_rate_or_significance",
+          "sharpe",
+          "profit_factor"
+        ],
+        "recommendation": "NO ROBUST EDGE - Do NOT proceed to Phase 5b. Failed: win_rate_or_significance, sharpe, profit_factor. Suggestions: review labels/features, increase sample, reduce model complexity, re-check costs, or extend real history coverage.",
+        "symbol": "GBPUSD",
+        "timeframe": "H1",
+        "multi_tf": false
+      }
+    },
+    {
+      "symbol": "GBPUSD",
+      "timeframe": "H4",
+      "period": "2019-01-01 to 2024-12-31",
+      "actual_data_period": "2023-10-01 to 2024-12-31",
+      "train_folds": 1,
+      "multi_tf": false,
+      "advanced_features": true,
+      "feature_groups_active": [
+        "price",
+        "returns",
+        "moving_averages",
+        "momentum",
+        "volatility",
+        "channels",
+        "volume",
+        "candle_structure",
+        "patterns",
+        "structure",
+        "session",
+        "regime",
+        "microstructure",
+        "correlation"
+      ],
+      "peer_symbols_loaded": [
+        "SPX500",
+        "US10Y",
+        "US30",
+        "USDJPY",
+        "USOIL",
+        "XAUUSD"
+      ],
+      "data_snapshot": {
+        "timeframe": "H4",
+        "bars": 1983,
+        "start": "2023-10-01 20:00:00+00:00",
+        "end": "2024-12-31 00:00:00+00:00",
+        "source": "candle_repository_or_yahoo"
+      },
+      "costs": {
+        "slippage_pips": 2.0,
+        "commission_pips": 0.3
+      },
+      "results": {
+        "fold_1": {
+          "train_period": "2023-10-01 to 2024-09-30",
+          "test_period": "2024-09-30 to 2024-12-31",
+          "test_win_rate": 0.2727272727272727,
+          "test_sharpe": -4.625843932945908,
+          "test_sortino": -4.441014663598125,
+          "test_profit_factor": 0.2563704305252731,
+          "test_max_dd": -11.042383200481055,
+          "test_trades": 22,
+          "trades_per_week": 1.6923076923076923,
+          "avg_trade_duration_hours": 0.0,
+          "train_accuracy": 0.5527426160337553,
+          "test_accuracy": 0.5555555555555556,
+          "overfitting_detected": false,
+          "accuracy_gap": -0.002812939521800284,
+          "significance": {
+            "is_significant": false,
+            "p_value": 0.9915497303009033,
+            "confidence": "95%",
+            "wins": 6,
+            "n_trades": 22,
+            "win_rate": 0.2727272727272727
+          },
+          "equity_end": 89273.13246868053,
+          "model_registration": {
+            "name": "GBPUSD_random_forest",
+            "version": "20260717T231028Z",
+            "path": "ai/artifacts/phase5b/models/models/GBPUSD_random_forest/20260717T231028Z",
+            "meta": {
+              "date": "2026-07-17T23:10:28.658836+00:00",
+              "metadata": {
+                "model_name": "GBPUSD_random_forest",
+                "project": "eTradeAI",
+                "registered_at": "2026-07-17T23:10:28.602452+00:00"
+              },
+              "model_file": "model.joblib",
+              "params": {},
+              "version": "20260717T231028Z"
+            },
+            "metrics": {
+              "accuracy": 0.5527426160337553,
+              "best_metric": 0.552096705177578,
+              "duration_seconds": 0.5299427509307861,
+              "f1": 0.552096705177578,
+              "test_accuracy": 0.46443514644351463,
+              "test_f1": 0.4428904428904429,
+              "val_accuracy": 0.5527426160337553,
+              "val_f1": 0.552096705177578
+            },
+            "hashes": {
+              "features.json": "baaf768cf8646185904e9c73ee28b4aee6398631b91fa2ca2f38d84be60bed9e",
+              "meta.json": "dc18a9567b4ef6c89c01a284ffc9097ad69481ed00f9670265254a27bc58ba42",
+              "metrics.json": "8ec3033db065b3a1aab84ff00fc97dd586f543efd61b014a29a5b5cfae012884",
+              "model.joblib": "a3d29cdc06b2e74c0df8cdf0eaf3aa289ac751d598af77c6a90ced737c775aab",
+              "scaler.json": "5e5640c9c438ddc049edf83c309057520444345ce42b91dcb51841af18da7a2e"
+            }
+          },
+          "feature_groups_active": [
+            "candle_structure",
+            "channels",
+            "correlation",
+            "microstructure",
+            "momentum",
+            "moving_averages",
+            "patterns",
+            "price",
+            "regime",
+            "returns",
+            "session",
+            "structure",
+            "volatility",
+            "volume"
+          ],
+          "generated_feature_groups": [
+            "price",
+            "moving_averages",
+            "momentum",
+            "volatility",
+            "volume",
+            "candle_structure",
+            "patterns",
+            "structure",
+            "session",
+            "regime",
+            "microstructure",
+            "correlation"
+          ],
+          "n_features": 479,
+          "peer_symbols": [
+            "SPX500",
+            "US10Y",
+            "US30",
+            "USDJPY",
+            "USOIL",
+            "XAUUSD"
+          ],
+          "model_params": {
+            "model_type": "random_forest",
+            "random_seed": 42
+          },
+          "feature_importance_top10": {
+            "micro_ofi_sma_50": 0.00863140468610479,
+            "micro_spread_zscore_5": 0.006986607640324727,
+            "candle_lower_wick": 0.006469902874276675,
+            "micro_buy_sell_ratio_50": 0.006313078996871575,
+            "micro_spread_zscore_50": 0.006193247733041909,
+            "volume_delta_ratio_50": 0.005777797877858726,
+            "micro_buy_volume": 0.005679431361846869,
+            "micro_ofi_sma_20": 0.00566541767359634,
+            "regime_variance_ratio_5": 0.005619986874993317,
+            "micro_spread_change": 0.005549646932673747
+          }
+        }
+      },
+      "aggregate": {
+        "avg_win_rate": 0.2727272727272727,
+        "std_win_rate": 0.0,
+        "avg_sharpe": -4.625843932945908,
+        "avg_sortino": -4.441014663598125,
+        "avg_profit_factor": 0.2563704305252731,
+        "avg_max_dd": -11.042383200481055,
+        "total_trades": 22,
+        "folds_significant": 0,
+        "overfitting_folds": 0,
+        "regime_stable": true,
+        "early_fold_sharpe": -4.625843932945908,
+        "late_fold_sharpe": -4.625843932945908,
+        "correlation_decay_per_fold": 0.0,
+        "overall_significant": false,
+        "pooled_significance": {
+          "is_significant": false,
+          "p_value": 0.9915497303009033,
+          "confidence": "95%",
+          "wins": 6,
+          "n_trades": 22,
+          "win_rate": 0.2727272727272727
+        },
+        "failures": [
+          "win_rate_or_significance",
+          "sharpe",
+          "profit_factor"
+        ],
+        "recommendation": "NO ROBUST EDGE - Do NOT proceed to Phase 5b. Failed: win_rate_or_significance, sharpe, profit_factor. Suggestions: review labels/features, increase sample, reduce model complexity, re-check costs, or extend real history coverage.",
+        "symbol": "GBPUSD",
+        "timeframe": "H4",
+        "multi_tf": false
+      }
+    },
+    {
+      "symbol": "GBPUSD",
+      "timeframe": "D1",
+      "period": "2019-01-01 to 2024-12-31",
+      "actual_data_period": "2019-01-01 to 2024-12-31",
+      "train_folds": 2,
+      "multi_tf": false,
+      "advanced_features": true,
+      "feature_groups_active": [
+        "price",
+        "returns",
+        "moving_averages",
+        "momentum",
+        "volatility",
+        "channels",
+        "volume",
+        "candle_structure",
+        "patterns",
+        "structure",
+        "session",
+        "regime",
+        "microstructure",
+        "correlation"
+      ],
+      "peer_symbols_loaded": [
+        "SPX500",
+        "US10Y",
+        "US30",
+        "USDJPY",
+        "USOIL",
+        "XAUUSD"
+      ],
+      "data_snapshot": {
+        "timeframe": "D1",
+        "bars": 1565,
+        "start": "2019-01-01 00:00:00+00:00",
+        "end": "2024-12-31 00:00:00+00:00",
+        "source": "candle_repository_or_yahoo"
+      },
+      "costs": {
+        "slippage_pips": 2.0,
+        "commission_pips": 0.3
+      },
+      "results": {
+        "fold_1": {
+          "train_period": "2019-01-01 to 2022-11-11",
+          "test_period": "2022-11-14 to 2023-10-31",
+          "test_win_rate": 0.5,
+          "test_sharpe": 0.03714293792081351,
+          "test_sortino": 0.05240636550769085,
+          "test_profit_factor": 1.2631830929391554,
+          "test_max_dd": -4.727492959744089,
+          "test_trades": 14,
+          "trades_per_week": 0.2792022792022792,
+          "avg_trade_duration_hours": 0.0,
+          "train_accuracy": 0.8344370860927153,
+          "test_accuracy": 0.8372093023255814,
+          "overfitting_detected": false,
+          "accuracy_gap": -0.002772216232866165,
+          "significance": {
+            "is_significant": false,
+            "p_value": 0.604736328125,
+            "confidence": "95%",
+            "wins": 7,
+            "n_trades": 14,
+            "win_rate": 0.5
+          },
+          "equity_end": 102085.16187076927,
+          "model_registration": {
+            "name": "GBPUSD_random_forest",
+            "version": "20260717T231055Z",
+            "path": "ai/artifacts/phase5b/models/models/GBPUSD_random_forest/20260717T231055Z",
+            "meta": {
+              "date": "2026-07-17T23:10:55.578370+00:00",
+              "metadata": {
+                "model_name": "GBPUSD_random_forest",
+                "project": "eTradeAI",
+                "registered_at": "2026-07-17T23:10:55.522984+00:00"
+              },
+              "model_file": "model.joblib",
+              "params": {},
+              "version": "20260717T231055Z"
+            },
+            "metrics": {
+              "accuracy": 0.8344370860927153,
+              "best_metric": 0.8330015483300155,
+              "duration_seconds": 0.4473576545715332,
+              "f1": 0.8330015483300155,
+              "test_accuracy": 0.8092105263157895,
+              "test_f1": 0.8088050314465408,
+              "val_accuracy": 0.8344370860927153,
+              "val_f1": 0.8330015483300155
+            },
+            "hashes": {
+              "features.json": "baaf768cf8646185904e9c73ee28b4aee6398631b91fa2ca2f38d84be60bed9e",
+              "meta.json": "1bb1725a5612c889f7719a53e5a7a07ced110800a7f032153bb607d4350d4a02",
+              "metrics.json": "638b0a166e47500530cbd400ee50f24a8a9d3d302e05715d466374a619e4573e",
+              "model.joblib": "7bfae285d9cc145b39a6ae292c766be9a6679479307224a162d1afc8848e955d",
+              "scaler.json": "5e5640c9c438ddc049edf83c309057520444345ce42b91dcb51841af18da7a2e"
+            }
+          },
+          "feature_groups_active": [
+            "candle_structure",
+            "channels",
+            "correlation",
+            "microstructure",
+            "momentum",
+            "moving_averages",
+            "patterns",
+            "price",
+            "regime",
+            "returns",
+            "session",
+            "structure",
+            "volatility",
+            "volume"
+          ],
+          "generated_feature_groups": [
+            "price",
+            "moving_averages",
+            "momentum",
+            "volatility",
+            "volume",
+            "candle_structure",
+            "patterns",
+            "structure",
+            "session",
+            "regime",
+            "microstructure",
+            "correlation"
+          ],
+          "n_features": 479,
+          "peer_symbols": [
+            "SPX500",
+            "US10Y",
+            "US30",
+            "USDJPY",
+            "USOIL",
+            "XAUUSD"
+          ],
+          "model_params": {
+            "model_type": "random_forest",
+            "random_seed": 42
+          },
+          "feature_importance_top10": {
+            "micro_sell_volume": 0.05661648790892795,
+            "micro_clv": 0.05021414513884235,
+            "candle_close_location": 0.03990012819372974,
+            "micro_buy_volume": 0.03907731363840554,
+            "candle_lower_wick_ratio": 0.03686219232302544,
+            "micro_order_flow_imbalance": 0.0355098389544477,
+            "micro_ofi_zscore_5": 0.03493409415404616,
+            "candle_upper_wick_ratio": 0.031758222525234775,
+            "micro_bid_ask_ratio": 0.030243005181071005,
+            "candle_open_location": 0.029916037049906013
+          }
+        },
+        "fold_2": {
+          "train_period": "2019-12-20 to 2023-10-31",
+          "test_period": "2023-11-01 to 2024-10-17",
+          "test_win_rate": 0.5833333333333334,
+          "test_sharpe": 0.8986699637374236,
+          "test_sortino": 1.326713825292095,
+          "test_profit_factor": 2.1816399172975776,
+          "test_max_dd": -3.1809067532406177,
+          "test_trades": 12,
+          "trades_per_week": 0.2393162393162393,
+          "avg_trade_duration_hours": 0.0,
+          "train_accuracy": 0.8211920529801324,
+          "test_accuracy": 0.8217054263565892,
+          "overfitting_detected": false,
+          "accuracy_gap": -0.0005133733764567383,
+          "significance": {
+            "is_significant": false,
+            "p_value": 0.38720703125,
+            "confidence": "95%",
+            "wins": 7,
+            "n_trades": 12,
+            "win_rate": 0.5833333333333334
+          },
+          "equity_end": 107262.01100927932,
+          "model_registration": {
+            "name": "GBPUSD_random_forest",
+            "version": "20260717T231113Z",
+            "path": "ai/artifacts/phase5b/models/models/GBPUSD_random_forest/20260717T231113Z",
+            "meta": {
+              "date": "2026-07-17T23:11:13.492035+00:00",
+              "metadata": {
+                "model_name": "GBPUSD_random_forest",
+                "project": "eTradeAI",
+                "registered_at": "2026-07-17T23:11:13.436252+00:00"
+              },
+              "model_file": "model.joblib",
+              "params": {},
+              "version": "20260717T231113Z"
+            },
+            "metrics": {
+              "accuracy": 0.8211920529801324,
+              "best_metric": 0.8204043874719176,
+              "duration_seconds": 0.48082828521728516,
+              "f1": 0.8204043874719176,
+              "test_accuracy": 0.8355263157894737,
+              "test_f1": 0.8343143666884674,
+              "val_accuracy": 0.8211920529801324,
+              "val_f1": 0.8204043874719176
+            },
+            "hashes": {
+              "features.json": "baaf768cf8646185904e9c73ee28b4aee6398631b91fa2ca2f38d84be60bed9e",
+              "meta.json": "968b625af3a1534c47b90cc53346bacfabf56d51ea5717fc74791e5b31721e3c",
+              "metrics.json": "b741b92f9759f3190bf9e6e51107d9b99d6f1b17416df1a2f029e9a65436498e",
+              "model.joblib": "1e7dee5a1ba2dc0642d7781a51ca700c52739ceaadfbc91cc74d1ecdb60b8d6c",
+              "scaler.json": "5e5640c9c438ddc049edf83c309057520444345ce42b91dcb51841af18da7a2e"
+            }
+          },
+          "feature_groups_active": [
+            "candle_structure",
+            "channels",
+            "correlation",
+            "microstructure",
+            "momentum",
+            "moving_averages",
+            "patterns",
+            "price",
+            "regime",
+            "returns",
+            "session",
+            "structure",
+            "volatility",
+            "volume"
+          ],
+          "generated_feature_groups": [
+            "price",
+            "moving_averages",
+            "momentum",
+            "volatility",
+            "volume",
+            "candle_structure",
+            "patterns",
+            "structure",
+            "session",
+            "regime",
+            "microstructure",
+            "correlation"
+          ],
+          "n_features": 479,
+          "peer_symbols": [
+            "SPX500",
+            "US10Y",
+            "US30",
+            "USDJPY",
+            "USOIL",
+            "XAUUSD"
+          ],
+          "model_params": {
+            "model_type": "random_forest",
+            "random_seed": 42
+          },
+          "feature_importance_top10": {
+            "micro_sell_volume": 0.051139345300993844,
+            "candle_lower_wick_ratio": 0.045448884156746534,
+            "micro_clv": 0.04379873063758385,
+            "candle_close_location": 0.04174569190500031,
+            "micro_buy_volume": 0.038379209264175505,
+            "micro_bid_ask_ratio": 0.03593522020825225,
+            "micro_order_flow_imbalance": 0.03338715505307535,
+            "price_close_position": 0.03257392051870087,
+            "candle_upper_wick_ratio": 0.031197046102401937,
+            "candle_open_location": 0.030494593802630105
+          }
+        }
+      },
+      "aggregate": {
+        "avg_win_rate": 0.5416666666666667,
+        "std_win_rate": 0.041666666666666685,
+        "avg_sharpe": 0.4679064508291185,
+        "avg_sortino": 0.6895600953998929,
+        "avg_profit_factor": 1.7224115051183664,
+        "avg_max_dd": -3.9541998564923535,
+        "total_trades": 26,
+        "folds_significant": 0,
+        "overfitting_folds": 0,
+        "regime_stable": true,
+        "early_fold_sharpe": 0.03714293792081351,
+        "late_fold_sharpe": 0.8986699637374236,
+        "correlation_decay_per_fold": -0.01087891464381531,
+        "overall_significant": false,
+        "pooled_significance": {
+          "is_significant": false,
+          "p_value": 0.42250949144363403,
+          "confidence": "95%",
+          "wins": 14,
+          "n_trades": 26,
+          "win_rate": 0.5416666666666667
+        },
+        "failures": [
+          "win_rate_or_significance",
+          "sharpe"
+        ],
+        "recommendation": "NO ROBUST EDGE - Do NOT proceed to Phase 5b. Failed: win_rate_or_significance, sharpe. Suggestions: review labels/features, increase sample, reduce model complexity, re-check costs, or extend real history coverage.",
+        "symbol": "GBPUSD",
+        "timeframe": "D1",
+        "multi_tf": false
+      }
+    },
+    {
+      "symbol": "GBPUSD",
+      "timeframe": "M15+H1+H4",
+      "period": "2019-01-01 to 2024-12-31",
+      "actual_data_period": "2026-04-26 to 2026-07-17",
+      "train_folds": 1,
+      "multi_tf": true,
+      "advanced_features": true,
+      "feature_groups_active": [
+        "price",
+        "returns",
+        "moving_averages",
+        "momentum",
+        "volatility",
+        "channels",
+        "volume",
+        "candle_structure",
+        "patterns",
+        "structure",
+        "session",
+        "regime",
+        "microstructure",
+        "correlation"
+      ],
+      "peer_symbols_loaded": [
+        "SPX500",
+        "US10Y",
+        "US30",
+        "USDJPY",
+        "USOIL",
+        "XAUUSD"
+      ],
+      "data_snapshot": {
+        "timeframe": "M15",
+        "bars": 5666,
+        "start": "2026-04-26 23:00:00+00:00",
+        "end": "2026-07-17 21:15:00+00:00",
+        "source": "candle_repository_or_yahoo"
+      },
+      "costs": {
+        "slippage_pips": 2.0,
+        "commission_pips": 0.3
+      },
+      "results": {
+        "fold_1": {
+          "train_period": "2026-04-26 to 2026-07-01",
+          "test_period": "2026-07-01 to 2026-07-17",
+          "test_win_rate": 0.4722222222222222,
+          "test_sharpe": -3.306888044858257,
+          "test_sortino": -4.83357667810452,
+          "test_profit_factor": 0.8903327922700881,
+          "test_max_dd": -9.258465294792567,
+          "test_trades": 36,
+          "trades_per_week": 16.8,
+          "avg_trade_duration_hours": 0.0,
+          "train_accuracy": 0.48748159057437407,
+          "test_accuracy": 0.5428571428571428,
+          "overfitting_detected": false,
+          "accuracy_gap": -0.05537555228276875,
+          "significance": {
+            "is_significant": false,
+            "p_value": 0.691140341485152,
+            "confidence": "95%",
+            "wins": 17,
+            "n_trades": 36,
+            "win_rate": 0.4722222222222222
+          },
+          "equity_end": 96814.06908253247,
+          "model_registration": {
+            "name": "GBPUSD_random_forest",
+            "version": "20260717T231139Z",
+            "path": "ai/artifacts/phase5b/models/models/GBPUSD_random_forest/20260717T231139Z",
+            "meta": {
+              "date": "2026-07-17T23:11:39.157782+00:00",
+              "metadata": {
+                "model_name": "GBPUSD_random_forest",
+                "project": "eTradeAI",
+                "registered_at": "2026-07-17T23:11:39.098371+00:00"
+              },
+              "model_file": "model.joblib",
+              "params": {},
+              "version": "20260717T231139Z"
+            },
+            "metrics": {
+              "accuracy": 0.48748159057437407,
+              "best_metric": 0.47680412371134023,
+              "duration_seconds": 1.0682072639465332,
+              "f1": 0.47680412371134023,
+              "test_accuracy": 0.5051395007342144,
+              "test_f1": 0.49035209469137586,
+              "val_accuracy": 0.48748159057437407,
+              "val_f1": 0.47680412371134023
+            },
+            "hashes": {
+              "features.json": "baaf768cf8646185904e9c73ee28b4aee6398631b91fa2ca2f38d84be60bed9e",
+              "meta.json": "f869a3429a59bc909b359273fc91c15c6d5ec9e94e7afe628b95d529f20af347",
+              "metrics.json": "bf7af65054346fdce445272b77d9c87f3f02ec663d26ec704e21068ed767327a",
+              "model.joblib": "97aef2d7c1eb3e8ac0e0b82a71a5dc430faadd46cb5f9871f6dacca6d3a670fc",
+              "scaler.json": "5e5640c9c438ddc049edf83c309057520444345ce42b91dcb51841af18da7a2e"
+            }
+          },
+          "feature_groups_active": [
+            "candle_structure",
+            "channels",
+            "correlation",
+            "microstructure",
+            "momentum",
+            "moving_averages",
+            "patterns",
+            "price",
+            "regime",
+            "returns",
+            "session",
+            "structure",
+            "volatility",
+            "volume"
+          ],
+          "generated_feature_groups": [
+            "price",
+            "moving_averages",
+            "momentum",
+            "volatility",
+            "volume",
+            "candle_structure",
+            "patterns",
+            "structure",
+            "session",
+            "regime",
+            "microstructure",
+            "correlation"
+          ],
+          "n_features": 479,
+          "peer_symbols": [
+            "SPX500",
+            "US10Y",
+            "US30",
+            "USDJPY",
+            "USOIL",
+            "XAUUSD"
+          ],
+          "model_params": {
+            "model_type": "random_forest",
+            "random_seed": 42
+          },
+          "feature_importance_top10": {
+            "micro_spread_zscore_20": 0.0075353798683639095,
+            "micro_ofi_zscore_10": 0.007000183960358808,
+            "corr_usdjpy_beta_50": 0.0064497601527787685,
+            "corr_class_fx_abs_50": 0.006358762448499179,
+            "sma_spread_100_200": 0.005836969512419668,
+            "corr_class_fx_50": 0.005690280835746273,
+            "corr_spx500_relative_return": 0.0055343880214544575,
+            "corr_usdjpy_relative_return": 0.005329272807141456,
+            "micro_spread_sma_50": 0.005265142472840734,
+            "return_open_close": 0.005254578765606493
+          }
+        }
+      },
+      "aggregate": {
+        "avg_win_rate": 0.4722222222222222,
+        "std_win_rate": 0.0,
+        "avg_sharpe": -3.306888044858257,
+        "avg_sortino": -4.83357667810452,
+        "avg_profit_factor": 0.8903327922700881,
+        "avg_max_dd": -9.258465294792567,
+        "total_trades": 36,
+        "folds_significant": 0,
+        "overfitting_folds": 0,
+        "regime_stable": true,
+        "early_fold_sharpe": -3.306888044858257,
+        "late_fold_sharpe": -3.306888044858257,
+        "correlation_decay_per_fold": 0.0,
+        "overall_significant": false,
+        "pooled_significance": {
+          "is_significant": false,
+          "p_value": 0.691140341485152,
+          "confidence": "95%",
+          "wins": 17,
+          "n_trades": 36,
+          "win_rate": 0.4722222222222222
+        },
+        "failures": [
+          "win_rate_or_significance",
+          "sharpe",
+          "profit_factor"
+        ],
+        "recommendation": "NO ROBUST EDGE - Do NOT proceed to Phase 5b. Failed: win_rate_or_significance, sharpe, profit_factor. Suggestions: review labels/features, increase sample, reduce model complexity, re-check costs, or extend real history coverage.",
+        "symbol": "GBPUSD",
+        "timeframe": "M15",
+        "multi_tf": true
+      }
+    },
+    {
+      "symbol": "USDJPY",
+      "timeframe": "M15",
+      "period": "2019-01-01 to 2024-12-31",
+      "actual_data_period": "2026-04-26 to 2026-07-17",
+      "train_folds": 1,
+      "multi_tf": false,
+      "advanced_features": true,
+      "feature_groups_active": [
+        "price",
+        "returns",
+        "moving_averages",
+        "momentum",
+        "volatility",
+        "channels",
+        "volume",
+        "candle_structure",
+        "patterns",
+        "structure",
+        "session",
+        "regime",
+        "microstructure",
+        "correlation"
+      ],
+      "peer_symbols_loaded": [
+        "SPX500",
+        "US10Y",
+        "US30",
+        "USOIL",
+        "XAUUSD"
+      ],
+      "data_snapshot": {
+        "timeframe": "M15",
+        "bars": 5648,
+        "start": "2026-04-26 23:00:00+00:00",
+        "end": "2026-07-17 20:45:00+00:00",
+        "source": "candle_repository_or_yahoo"
+      },
+      "costs": {
+        "slippage_pips": 2.0,
+        "commission_pips": 0.3
+      },
+      "results": {
+        "fold_1": {
+          "train_period": "2026-04-26 to 2026-07-01",
+          "test_period": "2026-07-01 to 2026-07-17",
+          "test_win_rate": 0.37037037037037035,
+          "test_sharpe": -23.565960305056795,
+          "test_sortino": -22.800650901292567,
+          "test_profit_factor": 0.33485042086989963,
+          "test_max_dd": -12.887705058281359,
+          "test_trades": 27,
+          "trades_per_week": 12.6,
+          "avg_trade_duration_hours": 0.0,
+          "train_accuracy": 0.49926144756277696,
+          "test_accuracy": 0.52,
+          "overfitting_detected": false,
+          "accuracy_gap": -0.020738552437223057,
+          "significance": {
+            "is_significant": false,
+            "p_value": 0.9389609396457672,
+            "confidence": "95%",
+            "wins": 10,
+            "n_trades": 27,
+            "win_rate": 0.37037037037037035
+          },
+          "equity_end": 87525.17204451507,
+          "model_registration": {
+            "name": "USDJPY_random_forest",
+            "version": "20260717T231227Z",
+            "path": "ai/artifacts/phase5b/models/models/USDJPY_random_forest/20260717T231227Z",
+            "meta": {
+              "date": "2026-07-17T23:12:27.683038+00:00",
+              "metadata": {
+                "model_name": "USDJPY_random_forest",
+                "project": "eTradeAI",
+                "registered_at": "2026-07-17T23:12:27.618306+00:00"
+              },
+              "model_file": "model.joblib",
+              "params": {},
+              "version": "20260717T231227Z"
+            },
+            "metrics": {
+              "accuracy": 0.49926144756277696,
+              "best_metric": 0.49799528843566876,
+              "duration_seconds": 1.0363759994506836,
+              "f1": 0.49799528843566876,
+              "test_accuracy": 0.5169366715758469,
+              "test_f1": 0.49705521029050437,
+              "val_accuracy": 0.49926144756277696,
+              "val_f1": 0.49799528843566876
+            },
+            "hashes": {
+              "features.json": "b0790b59d871910bd228490e988893a9bf019350d85c6fc3bd1c1bc9bc7c3247",
+              "meta.json": "9261a8eb6709ad1862046249778a7fc032dbec316a00ec09b7eec1aae700bfd6",
+              "metrics.json": "b559255fe1fcd2f5a310cf63c204492982c9e52cdf758978380d4f00b3c1244f",
+              "model.joblib": "fe5d7a609e76cf26b3a279b7f0cbf36a16abfc9308e4ec269297ad28b10c2196",
+              "scaler.json": "5e5640c9c438ddc049edf83c309057520444345ce42b91dcb51841af18da7a2e"
+            }
+          },
+          "feature_groups_active": [
+            "candle_structure",
+            "channels",
+            "correlation",
+            "microstructure",
+            "momentum",
+            "moving_averages",
+            "patterns",
+            "price",
+            "regime",
+            "returns",
+            "session",
+            "structure",
+            "volatility",
+            "volume"
+          ],
+          "generated_feature_groups": [
+            "price",
+            "moving_averages",
+            "momentum",
+            "volatility",
+            "volume",
+            "candle_structure",
+            "patterns",
+            "structure",
+            "session",
+            "regime",
+            "microstructure",
+            "correlation"
+          ],
+          "n_features": 474,
+          "peer_symbols": [
+            "SPX500",
+            "US10Y",
+            "US30",
+            "USOIL",
+            "XAUUSD"
+          ],
+          "model_params": {
+            "model_type": "random_forest",
+            "random_seed": 42
+          },
+          "feature_importance_top10": {
+            "sma_distance_5": 0.008910504554398624,
+            "regime_efficiency_ratio_50": 0.007864176066978647,
+            "vwap_distance_5": 0.00766227987499438,
+            "williams_r_14": 0.007589373317282446,
+            "ema_slope_5": 0.006927480551150807,
+            "log_return_1": 0.006914436206093817,
+            "micro_spread_change": 0.006701815014524195,
+            "return_open_close": 0.006682374579905868,
+            "micro_ofi_zscore_10": 0.006615863430981788,
+            "session_close_location": 0.006519049366305231
+          }
+        }
+      },
+      "aggregate": {
+        "avg_win_rate": 0.37037037037037035,
+        "std_win_rate": 0.0,
+        "avg_sharpe": -23.565960305056795,
+        "avg_sortino": -22.800650901292567,
+        "avg_profit_factor": 0.33485042086989963,
+        "avg_max_dd": -12.887705058281359,
+        "total_trades": 27,
+        "folds_significant": 0,
+        "overfitting_folds": 0,
+        "regime_stable": true,
+        "early_fold_sharpe": -23.565960305056795,
+        "late_fold_sharpe": -23.565960305056795,
+        "correlation_decay_per_fold": 0.0,
+        "overall_significant": false,
+        "pooled_significance": {
+          "is_significant": false,
+          "p_value": 0.9389609396457672,
+          "confidence": "95%",
+          "wins": 10,
+          "n_trades": 27,
+          "win_rate": 0.37037037037037035
+        },
+        "failures": [
+          "win_rate_or_significance",
+          "sharpe",
+          "profit_factor"
+        ],
+        "recommendation": "NO ROBUST EDGE - Do NOT proceed to Phase 5b. Failed: win_rate_or_significance, sharpe, profit_factor. Suggestions: review labels/features, increase sample, reduce model complexity, re-check costs, or extend real history coverage.",
+        "symbol": "USDJPY",
+        "timeframe": "M15",
+        "multi_tf": false
+      }
+    },
+    {
+      "symbol": "USDJPY",
+      "timeframe": "H1",
+      "period": "2019-01-01 to 2024-12-31",
+      "actual_data_period": "2023-10-01 to 2024-12-31",
+      "train_folds": 1,
+      "multi_tf": false,
+      "advanced_features": true,
+      "feature_groups_active": [
+        "price",
+        "returns",
+        "moving_averages",
+        "momentum",
+        "volatility",
+        "channels",
+        "volume",
+        "candle_structure",
+        "patterns",
+        "structure",
+        "session",
+        "regime",
+        "microstructure",
+        "correlation"
+      ],
+      "peer_symbols_loaded": [
+        "SPX500",
+        "US10Y",
+        "US30",
+        "USOIL",
+        "XAUUSD"
+      ],
+      "data_snapshot": {
+        "timeframe": "H1",
+        "bars": 7674,
+        "start": "2023-10-01 23:00:00+00:00",
+        "end": "2024-12-31 00:00:00+00:00",
+        "source": "candle_repository_or_yahoo"
+      },
+      "costs": {
+        "slippage_pips": 2.0,
+        "commission_pips": 0.3
+      },
+      "results": {
+        "fold_1": {
+          "train_period": "2023-10-01 to 2024-09-30",
+          "test_period": "2024-09-30 to 2024-12-31",
+          "test_win_rate": 0.4891304347826087,
+          "test_sharpe": 3.0610090089505233,
+          "test_sortino": 4.355018052950335,
+          "test_profit_factor": 1.2425969653699336,
+          "test_max_dd": -12.273092125457165,
+          "test_trades": 92,
+          "trades_per_week": 7.076923076923077,
+          "avg_trade_duration_hours": 0.0,
+          "train_accuracy": 0.4902173913043478,
+          "test_accuracy": 0.5119402985074627,
+          "overfitting_detected": false,
+          "accuracy_gap": -0.021722907203114872,
+          "significance": {
+            "is_significant": false,
+            "p_value": 0.6226741251947505,
+            "confidence": "95%",
+            "wins": 45,
+            "n_trades": 92,
+            "win_rate": 0.4891304347826087
+          },
+          "equity_end": 113021.80948864421,
+          "model_registration": {
+            "name": "USDJPY_random_forest",
+            "version": "20260717T231258Z",
+            "path": "ai/artifacts/phase5b/models/models/USDJPY_random_forest/20260717T231258Z",
+            "meta": {
+              "date": "2026-07-17T23:12:58.836792+00:00",
+              "metadata": {
+                "model_name": "USDJPY_random_forest",
+                "project": "eTradeAI",
+                "registered_at": "2026-07-17T23:12:58.772843+00:00"
+              },
+              "model_file": "model.joblib",
+              "params": {},
+              "version": "20260717T231258Z"
+            },
+            "metrics": {
+              "accuracy": 0.4902173913043478,
+              "best_metric": 0.45716977975042494,
+              "duration_seconds": 1.3332107067108154,
+              "f1": 0.45716977975042494,
+              "test_accuracy": 0.5032537960954447,
+              "test_f1": 0.4645108929975399,
+              "val_accuracy": 0.4902173913043478,
+              "val_f1": 0.45716977975042494
+            },
+            "hashes": {
+              "features.json": "b0790b59d871910bd228490e988893a9bf019350d85c6fc3bd1c1bc9bc7c3247",
+              "meta.json": "897ea0615f3138ed813413cdbfc22a0d95dead22b2e9e973c5c80c70a6b14643",
+              "metrics.json": "ca88c7aa433a521b8f8c3f586e46b61dd9a561d2c993a5a559c5d1a34ec44f85",
+              "model.joblib": "59bb3288f06d8e684c64eab88ae8e1b77d3e80f5b8cbbe636c0ae0f7b3505c60",
+              "scaler.json": "5e5640c9c438ddc049edf83c309057520444345ce42b91dcb51841af18da7a2e"
+            }
+          },
+          "feature_groups_active": [
+            "candle_structure",
+            "channels",
+            "correlation",
+            "microstructure",
+            "momentum",
+            "moving_averages",
+            "patterns",
+            "price",
+            "regime",
+            "returns",
+            "session",
+            "structure",
+            "volatility",
+            "volume"
+          ],
+          "generated_feature_groups": [
+            "price",
+            "moving_averages",
+            "momentum",
+            "volatility",
+            "volume",
+            "candle_structure",
+            "patterns",
+            "structure",
+            "session",
+            "regime",
+            "microstructure",
+            "correlation"
+          ],
+          "n_features": 474,
+          "peer_symbols": [
+            "SPX500",
+            "US10Y",
+            "US30",
+            "USOIL",
+            "XAUUSD"
+          ],
+          "model_params": {
+            "model_type": "random_forest",
+            "random_seed": 42
+          },
+          "feature_importance_top10": {
+            "session_dist_from_high": 0.008435670164445918,
+            "micro_spread_zscore_50": 0.008332749834459823,
+            "micro_ofi_zscore_20": 0.008034209649207962,
+            "micro_spread_zscore_20": 0.007359344280206236,
+            "candle_range": 0.007338758874982589,
+            "micro_ofi_zscore_10": 0.0072209804285104495,
+            "stochastic_spread_14_3": 0.0066942303827983544,
+            "micro_ofi_zscore_50": 0.006156490716350881,
+            "micro_buy_sell_ratio_5": 0.006086366753552306,
+            "williams_r_14": 0.006051618110136807
+          }
+        }
+      },
+      "aggregate": {
+        "avg_win_rate": 0.4891304347826087,
+        "std_win_rate": 0.0,
+        "avg_sharpe": 3.0610090089505233,
+        "avg_sortino": 4.355018052950335,
+        "avg_profit_factor": 1.2425969653699336,
+        "avg_max_dd": -12.273092125457165,
+        "total_trades": 92,
+        "folds_significant": 0,
+        "overfitting_folds": 0,
+        "regime_stable": true,
+        "early_fold_sharpe": 3.0610090089505233,
+        "late_fold_sharpe": 3.0610090089505233,
+        "correlation_decay_per_fold": 0.0,
+        "overall_significant": false,
+        "pooled_significance": {
+          "is_significant": false,
+          "p_value": 0.6226741251947505,
+          "confidence": "95%",
+          "wins": 45,
+          "n_trades": 92,
+          "win_rate": 0.4891304347826087
+        },
+        "failures": [
+          "win_rate_or_significance"
+        ],
+        "recommendation": "NO ROBUST EDGE - Do NOT proceed to Phase 5b. Failed: win_rate_or_significance. Suggestions: review labels/features, increase sample, reduce model complexity, re-check costs, or extend real history coverage.",
+        "symbol": "USDJPY",
+        "timeframe": "H1",
+        "multi_tf": false
+      }
+    },
+    {
+      "symbol": "USDJPY",
+      "timeframe": "H4",
+      "period": "2019-01-01 to 2024-12-31",
+      "actual_data_period": "2023-10-01 to 2024-12-31",
+      "train_folds": 1,
+      "multi_tf": false,
+      "advanced_features": true,
+      "feature_groups_active": [
+        "price",
+        "returns",
+        "moving_averages",
+        "momentum",
+        "volatility",
+        "channels",
+        "volume",
+        "candle_structure",
+        "patterns",
+        "structure",
+        "session",
+        "regime",
+        "microstructure",
+        "correlation"
+      ],
+      "peer_symbols_loaded": [
+        "SPX500",
+        "US10Y",
+        "US30",
+        "USOIL",
+        "XAUUSD"
+      ],
+      "data_snapshot": {
+        "timeframe": "H4",
+        "bars": 1984,
+        "start": "2023-10-01 20:00:00+00:00",
+        "end": "2024-12-31 00:00:00+00:00",
+        "source": "candle_repository_or_yahoo"
+      },
+      "costs": {
+        "slippage_pips": 2.0,
+        "commission_pips": 0.3
+      },
+      "results": {
+        "fold_1": {
+          "train_period": "2023-10-01 to 2024-09-30",
+          "test_period": "2024-09-30 to 2024-12-31",
+          "test_win_rate": 0.5666666666666667,
+          "test_sharpe": 4.024495372167145,
+          "test_sortino": 6.545126563051238,
+          "test_profit_factor": 2.060648093427683,
+          "test_max_dd": -6.8238434517340245,
+          "test_trades": 30,
+          "trades_per_week": 2.3076923076923075,
+          "avg_trade_duration_hours": 0.0,
+          "train_accuracy": 0.4369747899159664,
+          "test_accuracy": 0.5548172757475083,
+          "overfitting_detected": false,
+          "accuracy_gap": -0.11784248583154189,
+          "significance": {
+            "is_significant": false,
+            "p_value": 0.2923323558643461,
+            "confidence": "95%",
+            "wins": 17,
+            "n_trades": 30,
+            "win_rate": 0.5666666666666667
+          },
+          "equity_end": 115765.22805560371,
+          "model_registration": {
+            "name": "USDJPY_random_forest",
+            "version": "20260717T231354Z",
+            "path": "ai/artifacts/phase5b/models/models/USDJPY_random_forest/20260717T231354Z",
+            "meta": {
+              "date": "2026-07-17T23:13:54.084877+00:00",
+              "metadata": {
+                "model_name": "USDJPY_random_forest",
+                "project": "eTradeAI",
+                "registered_at": "2026-07-17T23:13:54.028651+00:00"
+              },
+              "model_file": "model.joblib",
+              "params": {},
+              "version": "20260717T231354Z"
+            },
+            "metrics": {
+              "accuracy": 0.4369747899159664,
+              "best_metric": 0.4151261737089202,
+              "duration_seconds": 0.5412600040435791,
+              "f1": 0.4151261737089202,
+              "test_accuracy": 0.5271966527196653,
+              "test_f1": 0.45687280040221223,
+              "val_accuracy": 0.4369747899159664,
+              "val_f1": 0.4151261737089202
+            },
+            "hashes": {
+              "features.json": "b0790b59d871910bd228490e988893a9bf019350d85c6fc3bd1c1bc9bc7c3247",
+              "meta.json": "62dd99784df5f238874c75c8c55a94966200aca9736e9155afe8be160b56a426",
+              "metrics.json": "1ec386d7452b0101b5bdd665c09695287c7075779acfeb43541c7c0c67526716",
+              "model.joblib": "9cc369c32ed6f5828e3049992281eb3c4aceb72aba56a74e4f36aedc98602167",
+              "scaler.json": "5e5640c9c438ddc049edf83c309057520444345ce42b91dcb51841af18da7a2e"
+            }
+          },
+          "feature_groups_active": [
+            "candle_structure",
+            "channels",
+            "correlation",
+            "microstructure",
+            "momentum",
+            "moving_averages",
+            "patterns",
+            "price",
+            "regime",
+            "returns",
+            "session",
+            "structure",
+            "volatility",
+            "volume"
+          ],
+          "generated_feature_groups": [
+            "price",
+            "moving_averages",
+            "momentum",
+            "volatility",
+            "volume",
+            "candle_structure",
+            "patterns",
+            "structure",
+            "session",
+            "regime",
+            "microstructure",
+            "correlation"
+          ],
+          "n_features": 474,
+          "peer_symbols": [
+            "SPX500",
+            "US10Y",
+            "US30",
+            "USOIL",
+            "XAUUSD"
+          ],
+          "model_params": {
+            "model_type": "random_forest",
+            "random_seed": 42
+          },
+          "feature_importance_top10": {
+            "session_progress": 0.011336670146145903,
+            "micro_ofi_zscore_10": 0.00931135727205415,
+            "micro_spread_change": 0.008428929210017469,
+            "session_minutes_into": 0.008278148381041739,
+            "candle_body_ratio": 0.006720461819432111,
+            "micro_ofi_zscore_20": 0.006307624038370981,
+            "price_close_position": 0.006130541210984778,
+            "session_close_location": 0.005882547863289699,
+            "micro_clv": 0.00577400035069781,
+            "micro_bid_ask_ratio_sma_5": 0.005683239466356543
+          }
+        }
+      },
+      "aggregate": {
+        "avg_win_rate": 0.5666666666666667,
+        "std_win_rate": 0.0,
+        "avg_sharpe": 4.024495372167145,
+        "avg_sortino": 6.545126563051238,
+        "avg_profit_factor": 2.060648093427683,
+        "avg_max_dd": -6.8238434517340245,
+        "total_trades": 30,
+        "folds_significant": 0,
+        "overfitting_folds": 0,
+        "regime_stable": true,
+        "early_fold_sharpe": 4.024495372167145,
+        "late_fold_sharpe": 4.024495372167145,
+        "correlation_decay_per_fold": 0.0,
+        "overall_significant": false,
+        "pooled_significance": {
+          "is_significant": false,
+          "p_value": 0.2923323558643461,
+          "confidence": "95%",
+          "wins": 17,
+          "n_trades": 30,
+          "win_rate": 0.5666666666666667
+        },
+        "failures": [
+          "win_rate_or_significance"
+        ],
+        "recommendation": "NO ROBUST EDGE - Do NOT proceed to Phase 5b. Failed: win_rate_or_significance. Suggestions: review labels/features, increase sample, reduce model complexity, re-check costs, or extend real history coverage.",
+        "symbol": "USDJPY",
+        "timeframe": "H4",
+        "multi_tf": false
+      }
+    },
+    {
+      "symbol": "USDJPY",
+      "timeframe": "D1",
+      "period": "2019-01-01 to 2024-12-31",
+      "actual_data_period": "2019-01-01 to 2024-12-31",
+      "train_folds": 2,
+      "multi_tf": false,
+      "advanced_features": true,
+      "feature_groups_active": [
+        "price",
+        "returns",
+        "moving_averages",
+        "momentum",
+        "volatility",
+        "channels",
+        "volume",
+        "candle_structure",
+        "patterns",
+        "structure",
+        "session",
+        "regime",
+        "microstructure",
+        "correlation"
+      ],
+      "peer_symbols_loaded": [
+        "SPX500",
+        "US10Y",
+        "US30",
+        "USOIL",
+        "XAUUSD"
+      ],
+      "data_snapshot": {
+        "timeframe": "D1",
+        "bars": 1565,
+        "start": "2019-01-01 00:00:00+00:00",
+        "end": "2024-12-31 00:00:00+00:00",
+        "source": "candle_repository_or_yahoo"
+      },
+      "costs": {
+        "slippage_pips": 2.0,
+        "commission_pips": 0.3
+      },
+      "results": {
+        "fold_1": {
+          "train_period": "2019-01-01 to 2022-11-11",
+          "test_period": "2022-11-14 to 2023-10-31",
+          "test_win_rate": 0.6,
+          "test_sharpe": 1.1128671096927993,
+          "test_sortino": 1.4602177047609304,
+          "test_profit_factor": 2.186039602492994,
+          "test_max_dd": -3.781030984767384,
+          "test_trades": 15,
+          "trades_per_week": 0.29914529914529914,
+          "avg_trade_duration_hours": 0.0,
+          "train_accuracy": 0.8278145695364238,
+          "test_accuracy": 0.8682170542635659,
+          "overfitting_detected": false,
+          "accuracy_gap": -0.04040248472714203,
+          "significance": {
+            "is_significant": false,
+            "p_value": 0.30361938476562494,
+            "confidence": "95%",
+            "wins": 9,
+            "n_trades": 15,
+            "win_rate": 0.6
+          },
+          "equity_end": 107343.68795668917,
+          "model_registration": {
+            "name": "USDJPY_random_forest",
+            "version": "20260717T231421Z",
+            "path": "ai/artifacts/phase5b/models/models/USDJPY_random_forest/20260717T231421Z",
+            "meta": {
+              "date": "2026-07-17T23:14:21.723775+00:00",
+              "metadata": {
+                "model_name": "USDJPY_random_forest",
+                "project": "eTradeAI",
+                "registered_at": "2026-07-17T23:14:21.668455+00:00"
+              },
+              "model_file": "model.joblib",
+              "params": {},
+              "version": "20260717T231421Z"
+            },
+            "metrics": {
+              "accuracy": 0.8278145695364238,
+              "best_metric": 0.8274437412095641,
+              "duration_seconds": 0.4632568359375,
+              "f1": 0.8274437412095641,
+              "test_accuracy": 0.8092105263157895,
+              "test_f1": 0.8088050314465409,
+              "val_accuracy": 0.8278145695364238,
+              "val_f1": 0.8274437412095641
+            },
+            "hashes": {
+              "features.json": "b0790b59d871910bd228490e988893a9bf019350d85c6fc3bd1c1bc9bc7c3247",
+              "meta.json": "cd792a0586defff9fb669426eeb026628b7bb01226e73fde451e55d9b8971aa6",
+              "metrics.json": "1faf34a251b6b3eb3d946b72e71570eaa4231f640f470eacb0ecc50560cf4434",
+              "model.joblib": "909d8b2a2aaa55a13cbc3276c8800dc20ad288e6bd6cf515a2893efee4d4563f",
+              "scaler.json": "5e5640c9c438ddc049edf83c309057520444345ce42b91dcb51841af18da7a2e"
+            }
+          },
+          "feature_groups_active": [
+            "candle_structure",
+            "channels",
+            "correlation",
+            "microstructure",
+            "momentum",
+            "moving_averages",
+            "patterns",
+            "price",
+            "regime",
+            "returns",
+            "session",
+            "structure",
+            "volatility",
+            "volume"
+          ],
+          "generated_feature_groups": [
+            "price",
+            "moving_averages",
+            "momentum",
+            "volatility",
+            "volume",
+            "candle_structure",
+            "patterns",
+            "structure",
+            "session",
+            "regime",
+            "microstructure",
+            "correlation"
+          ],
+          "n_features": 474,
+          "peer_symbols": [
+            "SPX500",
+            "US10Y",
+            "US30",
+            "USOIL",
+            "XAUUSD"
+          ],
+          "model_params": {
+            "model_type": "random_forest",
+            "random_seed": 42
+          },
+          "feature_importance_top10": {
+            "micro_sell_volume": 0.053429994964598077,
+            "candle_lower_wick_ratio": 0.04855798892363053,
+            "candle_open_location": 0.04840952370694165,
+            "candle_close_location": 0.04673308862442261,
+            "micro_clv": 0.0437060529053685,
+            "micro_buy_volume": 0.04248836607086582,
+            "candle_upper_wick_ratio": 0.04115458420798757,
+            "micro_bid_ask_ratio": 0.03602471013055084,
+            "micro_ofi_zscore_10": 0.034772886228630284,
+            "micro_order_flow_imbalance": 0.03465280338004573
+          }
+        },
+        "fold_2": {
+          "train_period": "2019-12-20 to 2023-10-31",
+          "test_period": "2023-11-01 to 2024-10-17",
+          "test_win_rate": 0.4666666666666667,
+          "test_sharpe": 0.09424747777608355,
+          "test_sortino": 0.10446253431536869,
+          "test_profit_factor": 1.2430248839347666,
+          "test_max_dd": -5.576177191940636,
+          "test_trades": 15,
+          "trades_per_week": 0.29914529914529914,
+          "avg_trade_duration_hours": 0.0,
+          "train_accuracy": 0.8543046357615894,
+          "test_accuracy": 0.8206896551724138,
+          "overfitting_detected": false,
+          "accuracy_gap": 0.03361498058917567,
+          "significance": {
+            "is_significant": false,
+            "p_value": 0.696380615234375,
+            "confidence": "95%",
+            "wins": 7,
+            "n_trades": 15,
+            "win_rate": 0.4666666666666667
+          },
+          "equity_end": 102402.19651981951,
+          "model_registration": {
+            "name": "USDJPY_random_forest",
+            "version": "20260717T231439Z",
+            "path": "ai/artifacts/phase5b/models/models/USDJPY_random_forest/20260717T231439Z",
+            "meta": {
+              "date": "2026-07-17T23:14:39.319754+00:00",
+              "metadata": {
+                "model_name": "USDJPY_random_forest",
+                "project": "eTradeAI",
+                "registered_at": "2026-07-17T23:14:39.264474+00:00"
+              },
+              "model_file": "model.joblib",
+              "params": {},
+              "version": "20260717T231439Z"
+            },
+            "metrics": {
+              "accuracy": 0.8543046357615894,
+              "best_metric": 0.8519607843137256,
+              "duration_seconds": 0.45580387115478516,
+              "f1": 0.8519607843137256,
+              "test_accuracy": 0.8618421052631579,
+              "test_f1": 0.8586046511627907,
+              "val_accuracy": 0.8543046357615894,
+              "val_f1": 0.8519607843137256
+            },
+            "hashes": {
+              "features.json": "b0790b59d871910bd228490e988893a9bf019350d85c6fc3bd1c1bc9bc7c3247",
+              "meta.json": "65eac371df49dd7684def1332e317bb2625f856cbacc6aa150942ff57ea33d9d",
+              "metrics.json": "71596818f0874dd9f7c5f78b97ea4c7024bf7b74ecf9e1cd321b6b2158d05d26",
+              "model.joblib": "d8a15ff5ac878bd64971ffb2919a416806c2c6c73267cebc7ebcd8df868fe401",
+              "scaler.json": "5e5640c9c438ddc049edf83c309057520444345ce42b91dcb51841af18da7a2e"
+            }
+          },
+          "feature_groups_active": [
+            "candle_structure",
+            "channels",
+            "correlation",
+            "microstructure",
+            "momentum",
+            "moving_averages",
+            "patterns",
+            "price",
+            "regime",
+            "returns",
+            "session",
+            "structure",
+            "volatility",
+            "volume"
+          ],
+          "generated_feature_groups": [
+            "price",
+            "moving_averages",
+            "momentum",
+            "volatility",
+            "volume",
+            "candle_structure",
+            "patterns",
+            "structure",
+            "session",
+            "regime",
+            "microstructure",
+            "correlation"
+          ],
+          "n_features": 474,
+          "peer_symbols": [
+            "SPX500",
+            "US10Y",
+            "US30",
+            "USOIL",
+            "XAUUSD"
+          ],
+          "model_params": {
+            "model_type": "random_forest",
+            "random_seed": 42
+          },
+          "feature_importance_top10": {
+            "micro_sell_volume": 0.057674088405017004,
+            "candle_lower_wick_ratio": 0.05315311247982164,
+            "micro_clv": 0.04869012993096813,
+            "candle_close_location": 0.04711677961682625,
+            "micro_buy_volume": 0.04139311811600937,
+            "micro_order_flow_imbalance": 0.04093091351829839,
+            "price_close_position": 0.04084402779963007,
+            "candle_upper_wick_ratio": 0.03955744384075139,
+            "micro_ofi_zscore_20": 0.03926475255677139,
+            "micro_ofi_zscore_10": 0.03506916578027823
+          }
+        }
+      },
+      "aggregate": {
+        "avg_win_rate": 0.5333333333333333,
+        "std_win_rate": 0.06666666666666665,
+        "avg_sharpe": 0.6035572937344414,
+        "avg_sortino": 0.7823401195381495,
+        "avg_profit_factor": 1.7145322432138803,
+        "avg_max_dd": -4.67860408835401,
+        "total_trades": 30,
+        "folds_significant": 0,
+        "overfitting_folds": 0,
+        "regime_stable": false,
+        "early_fold_sharpe": 1.1128671096927993,
+        "late_fold_sharpe": 0.09424747777608355,
+        "correlation_decay_per_fold": -0.3259512298695474,
+        "overall_significant": false,
+        "pooled_significance": {
+          "is_significant": false,
+          "p_value": 0.42776777595281607,
+          "confidence": "95%",
+          "wins": 16,
+          "n_trades": 30,
+          "win_rate": 0.5333333333333333
+        },
+        "failures": [
+          "win_rate_or_significance",
+          "regime_unstable"
+        ],
+        "recommendation": "NO ROBUST EDGE - Do NOT proceed to Phase 5b. Failed: win_rate_or_significance, regime_unstable. Suggestions: review labels/features, increase sample, reduce model complexity, re-check costs, or extend real history coverage.",
+        "symbol": "USDJPY",
+        "timeframe": "D1",
+        "multi_tf": false
+      }
+    },
+    {
+      "symbol": "USDJPY",
+      "timeframe": "M15+H1+H4",
+      "period": "2019-01-01 to 2024-12-31",
+      "actual_data_period": "2026-04-26 to 2026-07-17",
+      "train_folds": 1,
+      "multi_tf": true,
+      "advanced_features": true,
+      "feature_groups_active": [
+        "price",
+        "returns",
+        "moving_averages",
+        "momentum",
+        "volatility",
+        "channels",
+        "volume",
+        "candle_structure",
+        "patterns",
+        "structure",
+        "session",
+        "regime",
+        "microstructure",
+        "correlation"
+      ],
+      "peer_symbols_loaded": [
+        "SPX500",
+        "US10Y",
+        "US30",
+        "USOIL",
+        "XAUUSD"
+      ],
+      "data_snapshot": {
+        "timeframe": "M15",
+        "bars": 5648,
+        "start": "2026-04-26 23:00:00+00:00",
+        "end": "2026-07-17 20:45:00+00:00",
+        "source": "candle_repository_or_yahoo"
+      },
+      "costs": {
+        "slippage_pips": 2.0,
+        "commission_pips": 0.3
+      },
+      "results": {
+        "fold_1": {
+          "train_period": "2026-04-26 to 2026-07-01",
+          "test_period": "2026-07-01 to 2026-07-17",
+          "test_win_rate": 0.37037037037037035,
+          "test_sharpe": -23.565960305056795,
+          "test_sortino": -22.800650901292567,
+          "test_profit_factor": 0.33485042086989963,
+          "test_max_dd": -12.887705058281359,
+          "test_trades": 27,
+          "trades_per_week": 12.6,
+          "avg_trade_duration_hours": 0.0,
+          "train_accuracy": 0.49926144756277696,
+          "test_accuracy": 0.52,
+          "overfitting_detected": false,
+          "accuracy_gap": -0.020738552437223057,
+          "significance": {
+            "is_significant": false,
+            "p_value": 0.9389609396457672,
+            "confidence": "95%",
+            "wins": 10,
+            "n_trades": 27,
+            "win_rate": 0.37037037037037035
+          },
+          "equity_end": 87525.17204451507,
+          "model_registration": {
+            "name": "USDJPY_random_forest",
+            "version": "20260717T231503Z",
+            "path": "ai/artifacts/phase5b/models/models/USDJPY_random_forest/20260717T231503Z",
+            "meta": {
+              "date": "2026-07-17T23:15:03.402345+00:00",
+              "metadata": {
+                "model_name": "USDJPY_random_forest",
+                "project": "eTradeAI",
+                "registered_at": "2026-07-17T23:15:03.338320+00:00"
+              },
+              "model_file": "model.joblib",
+              "params": {},
+              "version": "20260717T231503Z"
+            },
+            "metrics": {
+              "accuracy": 0.49926144756277696,
+              "best_metric": 0.49799528843566876,
+              "duration_seconds": 1.0354363918304443,
+              "f1": 0.49799528843566876,
+              "test_accuracy": 0.5169366715758469,
+              "test_f1": 0.49705521029050437,
+              "val_accuracy": 0.49926144756277696,
+              "val_f1": 0.49799528843566876
+            },
+            "hashes": {
+              "features.json": "b0790b59d871910bd228490e988893a9bf019350d85c6fc3bd1c1bc9bc7c3247",
+              "meta.json": "9ce3b65043fdb99d2fc0ebde299cef4cd682073ef733a11ffa4344a0c6cac88f",
+              "metrics.json": "4445e41d2cc583b48899e5ea19a0bde247e32bdcbb11e70e0cac4ba0a58f96f1",
+              "model.joblib": "fe5d7a609e76cf26b3a279b7f0cbf36a16abfc9308e4ec269297ad28b10c2196",
+              "scaler.json": "5e5640c9c438ddc049edf83c309057520444345ce42b91dcb51841af18da7a2e"
+            }
+          },
+          "feature_groups_active": [
+            "candle_structure",
+            "channels",
+            "correlation",
+            "microstructure",
+            "momentum",
+            "moving_averages",
+            "patterns",
+            "price",
+            "regime",
+            "returns",
+            "session",
+            "structure",
+            "volatility",
+            "volume"
+          ],
+          "generated_feature_groups": [
+            "price",
+            "moving_averages",
+            "momentum",
+            "volatility",
+            "volume",
+            "candle_structure",
+            "patterns",
+            "structure",
+            "session",
+            "regime",
+            "microstructure",
+            "correlation"
+          ],
+          "n_features": 474,
+          "peer_symbols": [
+            "SPX500",
+            "US10Y",
+            "US30",
+            "USOIL",
+            "XAUUSD"
+          ],
+          "model_params": {
+            "model_type": "random_forest",
+            "random_seed": 42
+          },
+          "feature_importance_top10": {
+            "sma_distance_5": 0.008910504554398624,
+            "regime_efficiency_ratio_50": 0.007864176066978647,
+            "vwap_distance_5": 0.00766227987499438,
+            "williams_r_14": 0.007589373317282446,
+            "ema_slope_5": 0.006927480551150807,
+            "log_return_1": 0.006914436206093817,
+            "micro_spread_change": 0.006701815014524195,
+            "return_open_close": 0.006682374579905868,
+            "micro_ofi_zscore_10": 0.006615863430981788,
+            "session_close_location": 0.006519049366305231
+          }
+        }
+      },
+      "aggregate": {
+        "avg_win_rate": 0.37037037037037035,
+        "std_win_rate": 0.0,
+        "avg_sharpe": -23.565960305056795,
+        "avg_sortino": -22.800650901292567,
+        "avg_profit_factor": 0.33485042086989963,
+        "avg_max_dd": -12.887705058281359,
+        "total_trades": 27,
+        "folds_significant": 0,
+        "overfitting_folds": 0,
+        "regime_stable": true,
+        "early_fold_sharpe": -23.565960305056795,
+        "late_fold_sharpe": -23.565960305056795,
+        "correlation_decay_per_fold": 0.0,
+        "overall_significant": false,
+        "pooled_significance": {
+          "is_significant": false,
+          "p_value": 0.9389609396457672,
+          "confidence": "95%",
+          "wins": 10,
+          "n_trades": 27,
+          "win_rate": 0.37037037037037035
+        },
+        "failures": [
+          "win_rate_or_significance",
+          "sharpe",
+          "profit_factor"
+        ],
+        "recommendation": "NO ROBUST EDGE - Do NOT proceed to Phase 5b. Failed: win_rate_or_significance, sharpe, profit_factor. Suggestions: review labels/features, increase sample, reduce model complexity, re-check costs, or extend real history coverage.",
+        "symbol": "USDJPY",
+        "timeframe": "M15",
+        "multi_tf": true
+      }
+    },
+    {
+      "symbol": "XAUUSD",
+      "timeframe": "M15",
+      "period": "2019-01-01 to 2024-12-31",
+      "actual_data_period": "2026-05-06 to 2026-07-17",
+      "train_folds": 1,
+      "multi_tf": false,
+      "advanced_features": true,
+      "feature_groups_active": [
+        "price",
+        "returns",
+        "moving_averages",
+        "momentum",
+        "volatility",
+        "channels",
+        "volume",
+        "candle_structure",
+        "patterns",
+        "structure",
+        "session",
+        "regime",
+        "microstructure",
+        "correlation"
+      ],
+      "peer_symbols_loaded": [
+        "SPX500",
+        "US10Y",
+        "US30",
+        "USDJPY",
+        "USOIL"
+      ],
+      "data_snapshot": {
+        "timeframe": "M15",
+        "bars": 4600,
+        "start": "2026-05-06 04:00:00+00:00",
+        "end": "2026-07-17 20:45:00+00:00",
+        "source": "candle_repository_or_yahoo"
+      },
+      "costs": {
+        "slippage_pips": 2.0,
+        "commission_pips": 0.3
+      },
+      "results": {
+        "fold_1": {
+          "train_period": "2026-05-06 to 2026-07-03",
+          "test_period": "2026-07-05 to 2026-07-17",
+          "test_win_rate": 0.32142857142857145,
+          "test_sharpe": -7.74616646104471,
+          "test_sortino": -8.197398023443055,
+          "test_profit_factor": 0.669549805396553,
+          "test_max_dd": -10.259848017414466,
+          "test_trades": 28,
+          "trades_per_week": 17.81818181818182,
+          "avg_trade_duration_hours": 0.0,
+          "train_accuracy": 0.5081669691470054,
+          "test_accuracy": 0.5294117647058824,
+          "overfitting_detected": false,
+          "accuracy_gap": -0.021244795558876928,
+          "significance": {
+            "is_significant": false,
+            "p_value": 0.9821509309113026,
+            "confidence": "95%",
+            "wins": 9,
+            "n_trades": 28,
+            "win_rate": 0.32142857142857145
+          },
+          "equity_end": 93063.84596616321,
+          "model_registration": {
+            "name": "XAUUSD_random_forest",
+            "version": "20260717T231550Z",
+            "path": "ai/artifacts/phase5b/models/models/XAUUSD_random_forest/20260717T231550Z",
+            "meta": {
+              "date": "2026-07-17T23:15:50.550875+00:00",
+              "metadata": {
+                "model_name": "XAUUSD_random_forest",
+                "project": "eTradeAI",
+                "registered_at": "2026-07-17T23:15:50.490245+00:00"
+              },
+              "model_file": "model.joblib",
+              "params": {},
+              "version": "20260717T231550Z"
+            },
+            "metrics": {
+              "accuracy": 0.5081669691470054,
+              "best_metric": 0.48926513091512314,
+              "duration_seconds": 0.9789590835571289,
+              "f1": 0.48926513091512314,
+              "test_accuracy": 0.5479204339963833,
+              "test_f1": 0.5463048044106065,
+              "val_accuracy": 0.5081669691470054,
+              "val_f1": 0.48926513091512314
+            },
+            "hashes": {
+              "features.json": "179dd9a50015c2f9b0a39f9cb0825a2b643b95a5372cd7345ca7c6607c65abc1",
+              "meta.json": "0dc2f2ae07196ab613ac5f9ea66ec955fc4307bb3b687d8831ddf2b4134469d2",
+              "metrics.json": "3762eaf42090a86290cf15d23df4c69af2731bb7c6fc1fdc296e503ea816fc0d",
+              "model.joblib": "cf99dd8d8ba592f9b4b3b894fef5053a2bca3e1ca708407f40783028fdd5dde7",
+              "scaler.json": "5e5640c9c438ddc049edf83c309057520444345ce42b91dcb51841af18da7a2e"
+            }
+          },
+          "feature_groups_active": [
+            "candle_structure",
+            "channels",
+            "correlation",
+            "microstructure",
+            "momentum",
+            "moving_averages",
+            "patterns",
+            "price",
+            "regime",
+            "returns",
+            "session",
+            "structure",
+            "volatility",
+            "volume"
+          ],
+          "generated_feature_groups": [
+            "price",
+            "moving_averages",
+            "momentum",
+            "volatility",
+            "volume",
+            "candle_structure",
+            "patterns",
+            "structure",
+            "session",
+            "regime",
+            "microstructure",
+            "correlation"
+          ],
+          "n_features": 474,
+          "peer_symbols": [
+            "SPX500",
+            "US10Y",
+            "US30",
+            "USDJPY",
+            "USOIL"
+          ],
+          "model_params": {
+            "model_type": "random_forest",
+            "random_seed": 42
+          },
+          "feature_importance_top10": {
+            "micro_ofi_zscore_5": 0.007501808295748925,
+            "micro_ofi_zscore_10": 0.007229077637169621,
+            "micro_order_flow_imbalance": 0.006915738361314046,
+            "micro_ofi_zscore_20": 0.006674945908640779,
+            "candle_close_location": 0.006280683062635673,
+            "micro_ofi_zscore_50": 0.0062420508773136825,
+            "regime_efficiency_ratio_10": 0.006090855599430608,
+            "session_close_location": 0.005979285657388929,
+            "session_dist_from_low": 0.005877393650596306,
+            "micro_bid_ask_ratio_sma_10": 0.0057491038314571455
+          }
+        }
+      },
+      "aggregate": {
+        "avg_win_rate": 0.32142857142857145,
+        "std_win_rate": 0.0,
+        "avg_sharpe": -7.74616646104471,
+        "avg_sortino": -8.197398023443055,
+        "avg_profit_factor": 0.669549805396553,
+        "avg_max_dd": -10.259848017414466,
+        "total_trades": 28,
+        "folds_significant": 0,
+        "overfitting_folds": 0,
+        "regime_stable": true,
+        "early_fold_sharpe": -7.74616646104471,
+        "late_fold_sharpe": -7.74616646104471,
+        "correlation_decay_per_fold": 0.0,
+        "overall_significant": false,
+        "pooled_significance": {
+          "is_significant": false,
+          "p_value": 0.9821509309113026,
+          "confidence": "95%",
+          "wins": 9,
+          "n_trades": 28,
+          "win_rate": 0.32142857142857145
+        },
+        "failures": [
+          "win_rate_or_significance",
+          "sharpe",
+          "profit_factor"
+        ],
+        "recommendation": "NO ROBUST EDGE - Do NOT proceed to Phase 5b. Failed: win_rate_or_significance, sharpe, profit_factor. Suggestions: review labels/features, increase sample, reduce model complexity, re-check costs, or extend real history coverage.",
+        "symbol": "XAUUSD",
+        "timeframe": "M15",
+        "multi_tf": false
+      }
+    },
+    {
+      "symbol": "XAUUSD",
+      "timeframe": "H1",
+      "period": "2019-01-01 to 2024-12-31",
+      "actual_data_period": "2024-02-23 to 2024-12-31",
+      "train_folds": 1,
+      "multi_tf": false,
+      "advanced_features": true,
+      "feature_groups_active": [
+        "price",
+        "returns",
+        "moving_averages",
+        "momentum",
+        "volatility",
+        "channels",
+        "volume",
+        "candle_structure",
+        "patterns",
+        "structure",
+        "session",
+        "regime",
+        "microstructure",
+        "correlation"
+      ],
+      "peer_symbols_loaded": [
+        "SPX500",
+        "US10Y",
+        "US30",
+        "USDJPY",
+        "USOIL"
+      ],
+      "data_snapshot": {
+        "timeframe": "H1",
+        "bars": 4890,
+        "start": "2024-02-23 05:00:00+00:00",
+        "end": "2024-12-31 00:00:00+00:00",
+        "source": "candle_repository_or_yahoo"
+      },
+      "costs": {
+        "slippage_pips": 2.0,
+        "commission_pips": 0.3
+      },
+      "results": {
+        "fold_1": {
+          "train_period": "2024-02-23 to 2024-10-28",
+          "test_period": "2024-10-28 to 2024-12-31",
+          "test_win_rate": 0.43478260869565216,
+          "test_sharpe": -4.17234095915429,
+          "test_sortino": -4.387773378933238,
+          "test_profit_factor": 0.5606339558579517,
+          "test_max_dd": -9.499657423237453,
+          "test_trades": 23,
+          "trades_per_week": 2.5555555555555554,
+          "avg_trade_duration_hours": 0.0,
+          "train_accuracy": 0.4812286689419795,
+          "test_accuracy": 0.5686274509803921,
+          "overfitting_detected": false,
+          "accuracy_gap": -0.08739878203841261,
+          "significance": {
+            "is_significant": false,
+            "p_value": 0.7975635528564453,
+            "confidence": "95%",
+            "wins": 10,
+            "n_trades": 23,
+            "win_rate": 0.43478260869565216
+          },
+          "equity_end": 91521.3467316117,
+          "model_registration": {
+            "name": "XAUUSD_random_forest",
+            "version": "20260717T231614Z",
+            "path": "ai/artifacts/phase5b/models/models/XAUUSD_random_forest/20260717T231614Z",
+            "meta": {
+              "date": "2026-07-17T23:16:14.888135+00:00",
+              "metadata": {
+                "model_name": "XAUUSD_random_forest",
+                "project": "eTradeAI",
+                "registered_at": "2026-07-17T23:16:14.829347+00:00"
+              },
+              "model_file": "model.joblib",
+              "params": {},
+              "version": "20260717T231614Z"
+            },
+            "metrics": {
+              "accuracy": 0.4812286689419795,
+              "best_metric": 0.41737310308738884,
+              "duration_seconds": 1.0135066509246826,
+              "f1": 0.41737310308738884,
+              "test_accuracy": 0.5102040816326531,
+              "test_f1": 0.4235294117647058,
+              "val_accuracy": 0.4812286689419795,
+              "val_f1": 0.41737310308738884
+            },
+            "hashes": {
+              "features.json": "179dd9a50015c2f9b0a39f9cb0825a2b643b95a5372cd7345ca7c6607c65abc1",
+              "meta.json": "fd36e465cbb0677ea6ccd1a74c60788d7ca6d2ad3b6f831b368e7027c493af16",
+              "metrics.json": "7d5d70ab85a970ec283b1b89280e0da219fdca95436b7710761687608008c132",
+              "model.joblib": "411f04bfe86876e48356fa46510d99246067d9b19deaba5b15c78650725d301c",
+              "scaler.json": "5e5640c9c438ddc049edf83c309057520444345ce42b91dcb51841af18da7a2e"
+            }
+          },
+          "feature_groups_active": [
+            "candle_structure",
+            "channels",
+            "correlation",
+            "microstructure",
+            "momentum",
+            "moving_averages",
+            "patterns",
+            "price",
+            "regime",
+            "returns",
+            "session",
+            "structure",
+            "volatility",
+            "volume"
+          ],
+          "generated_feature_groups": [
+            "price",
+            "moving_averages",
+            "momentum",
+            "volatility",
+            "volume",
+            "candle_structure",
+            "patterns",
+            "structure",
+            "session",
+            "regime",
+            "microstructure",
+            "correlation"
+          ],
+          "n_features": 474,
+          "peer_symbols": [
+            "SPX500",
+            "US10Y",
+            "US30",
+            "USDJPY",
+            "USOIL"
+          ],
+          "model_params": {
+            "model_type": "random_forest",
+            "random_seed": 42
+          },
+          "feature_importance_top10": {
+            "volume_delta_ratio_50": 0.008852488278637672,
+            "fx_vix_vol_of_vol": 0.008559207223921384,
+            "corr_spx500_spread_zscore_50": 0.008020496034404436,
+            "corr_usoil_spread_zscore_50": 0.007546683655278493,
+            "micro_signed_volume_ratio_50": 0.0067305927056006635,
+            "volume_zscore_20": 0.006551385502431226,
+            "corr_us10y_relative_return": 0.006492496500771372,
+            "dollar_volume_sma_5": 0.00641700906329537,
+            "corr_usoil_relative_return": 0.006163775478324733,
+            "volume_sma_5": 0.00584742229683447
+          }
+        }
+      },
+      "aggregate": {
+        "avg_win_rate": 0.43478260869565216,
+        "std_win_rate": 0.0,
+        "avg_sharpe": -4.17234095915429,
+        "avg_sortino": -4.387773378933238,
+        "avg_profit_factor": 0.5606339558579517,
+        "avg_max_dd": -9.499657423237453,
+        "total_trades": 23,
+        "folds_significant": 0,
+        "overfitting_folds": 0,
+        "regime_stable": true,
+        "early_fold_sharpe": -4.17234095915429,
+        "late_fold_sharpe": -4.17234095915429,
+        "correlation_decay_per_fold": 0.0,
+        "overall_significant": false,
+        "pooled_significance": {
+          "is_significant": false,
+          "p_value": 0.7975635528564453,
+          "confidence": "95%",
+          "wins": 10,
+          "n_trades": 23,
+          "win_rate": 0.43478260869565216
+        },
+        "failures": [
+          "win_rate_or_significance",
+          "sharpe",
+          "profit_factor"
+        ],
+        "recommendation": "NO ROBUST EDGE - Do NOT proceed to Phase 5b. Failed: win_rate_or_significance, sharpe, profit_factor. Suggestions: review labels/features, increase sample, reduce model complexity, re-check costs, or extend real history coverage.",
+        "symbol": "XAUUSD",
+        "timeframe": "H1",
+        "multi_tf": false
+      }
+    },
+    {
+      "symbol": "XAUUSD",
+      "timeframe": "H4",
+      "period": "2019-01-01 to 2024-12-31",
+      "actual_data_period": "2024-02-23 to 2024-12-31",
+      "train_folds": 1,
+      "multi_tf": false,
+      "advanced_features": true,
+      "feature_groups_active": [
+        "price",
+        "returns",
+        "moving_averages",
+        "momentum",
+        "volatility",
+        "channels",
+        "volume",
+        "candle_structure",
+        "patterns",
+        "structure",
+        "session",
+        "regime",
+        "microstructure",
+        "correlation"
+      ],
+      "peer_symbols_loaded": [
+        "SPX500",
+        "US10Y",
+        "US30",
+        "USDJPY",
+        "USOIL"
+      ],
+      "data_snapshot": {
+        "timeframe": "H4",
+        "bars": 1326,
+        "start": "2024-02-23 04:00:00+00:00",
+        "end": "2024-12-31 00:00:00+00:00",
+        "source": "candle_repository_or_yahoo"
+      },
+      "costs": {
+        "slippage_pips": 2.0,
+        "commission_pips": 0.3
+      },
+      "results": {
+        "fold_1": {
+          "train_period": "2024-02-23 to 2024-10-28",
+          "test_period": "2024-10-28 to 2024-12-31",
+          "test_win_rate": 0.3125,
+          "test_sharpe": -2.463001126280393,
+          "test_sortino": -2.33259189317077,
+          "test_profit_factor": 0.5588527556471681,
+          "test_max_dd": -8.082526393729609,
+          "test_trades": 16,
+          "trades_per_week": 1.7777777777777777,
+          "avg_trade_duration_hours": 0.0,
+          "train_accuracy": 0.5723270440251572,
+          "test_accuracy": 0.5063291139240507,
+          "overfitting_detected": false,
+          "accuracy_gap": 0.06599793010110655,
+          "significance": {
+            "is_significant": false,
+            "p_value": 0.9615936279296875,
+            "confidence": "95%",
+            "wins": 5,
+            "n_trades": 16,
+            "win_rate": 0.3125
+          },
+          "equity_end": 95433.8738033799,
+          "model_registration": {
+            "name": "XAUUSD_random_forest",
+            "version": "20260717T231650Z",
+            "path": "ai/artifacts/phase5b/models/models/XAUUSD_random_forest/20260717T231650Z",
+            "meta": {
+              "date": "2026-07-17T23:16:50.081636+00:00",
+              "metadata": {
+                "model_name": "XAUUSD_random_forest",
+                "project": "eTradeAI",
+                "registered_at": "2026-07-17T23:16:50.026928+00:00"
+              },
+              "model_file": "model.joblib",
+              "params": {},
+              "version": "20260717T231650Z"
+            },
+            "metrics": {
+              "accuracy": 0.5723270440251572,
+              "best_metric": 0.4580994386527667,
+              "duration_seconds": 0.47437143325805664,
+              "f1": 0.4580994386527667,
+              "test_accuracy": 0.49056603773584906,
+              "test_f1": 0.39921630825208754,
+              "val_accuracy": 0.5723270440251572,
+              "val_f1": 0.4580994386527667
+            },
+            "hashes": {
+              "features.json": "179dd9a50015c2f9b0a39f9cb0825a2b643b95a5372cd7345ca7c6607c65abc1",
+              "meta.json": "7885a08cb0560cf544ace90a9b55666d00ff275c24006174203ff2d318939321",
+              "metrics.json": "4a0e08f4b4958677601c7bad82b0c82899f4a9faad4f7a8be2652b52d3d50509",
+              "model.joblib": "da12aa6558f8165f3f9f0d3d1843e01a16bcbcbc52ab609572d753c96f07a259",
+              "scaler.json": "5e5640c9c438ddc049edf83c309057520444345ce42b91dcb51841af18da7a2e"
+            }
+          },
+          "feature_groups_active": [
+            "candle_structure",
+            "channels",
+            "correlation",
+            "microstructure",
+            "momentum",
+            "moving_averages",
+            "patterns",
+            "price",
+            "regime",
+            "returns",
+            "session",
+            "structure",
+            "volatility",
+            "volume"
+          ],
+          "generated_feature_groups": [
+            "price",
+            "moving_averages",
+            "momentum",
+            "volatility",
+            "volume",
+            "candle_structure",
+            "patterns",
+            "structure",
+            "session",
+            "regime",
+            "microstructure",
+            "correlation"
+          ],
+          "n_features": 474,
+          "peer_symbols": [
+            "SPX500",
+            "US10Y",
+            "US30",
+            "USDJPY",
+            "USOIL"
+          ],
+          "model_params": {
+            "model_type": "random_forest",
+            "random_seed": 42
+          },
+          "feature_importance_top10": {
+            "ichimoku_cloud_width": 0.011930456293556263,
+            "regime_variance_ratio_5": 0.007398118469978537,
+            "session_close_location": 0.006884095783708514,
+            "micro_sell_volume": 0.00642408135525707,
+            "session_return": 0.006259038190600124,
+            "corr_us30_beta_50": 0.006257753183865929,
+            "vwap_distance_50": 0.005940368533240289,
+            "sma_distance_5": 0.005891626357728163,
+            "session_dist_from_high": 0.005714216015868375,
+            "candle_body_ratio": 0.005557790333206086
+          }
+        }
+      },
+      "aggregate": {
+        "avg_win_rate": 0.3125,
+        "std_win_rate": 0.0,
+        "avg_sharpe": -2.463001126280393,
+        "avg_sortino": -2.33259189317077,
+        "avg_profit_factor": 0.5588527556471681,
+        "avg_max_dd": -8.082526393729609,
+        "total_trades": 16,
+        "folds_significant": 0,
+        "overfitting_folds": 0,
+        "regime_stable": true,
+        "early_fold_sharpe": -2.463001126280393,
+        "late_fold_sharpe": -2.463001126280393,
+        "correlation_decay_per_fold": 0.0,
+        "overall_significant": false,
+        "pooled_significance": {
+          "is_significant": false,
+          "p_value": 0.9615936279296875,
+          "confidence": "95%",
+          "wins": 5,
+          "n_trades": 16,
+          "win_rate": 0.3125
+        },
+        "failures": [
+          "win_rate_or_significance",
+          "sharpe",
+          "profit_factor"
+        ],
+        "recommendation": "NO ROBUST EDGE - Do NOT proceed to Phase 5b. Failed: win_rate_or_significance, sharpe, profit_factor. Suggestions: review labels/features, increase sample, reduce model complexity, re-check costs, or extend real history coverage.",
+        "symbol": "XAUUSD",
+        "timeframe": "H4",
+        "multi_tf": false
+      }
+    },
+    {
+      "symbol": "XAUUSD",
+      "timeframe": "D1",
+      "period": "2019-01-01 to 2024-12-31",
+      "actual_data_period": "2019-01-02 to 2024-12-31",
+      "train_folds": 1,
+      "multi_tf": false,
+      "advanced_features": true,
+      "feature_groups_active": [
+        "price",
+        "returns",
+        "moving_averages",
+        "momentum",
+        "volatility",
+        "channels",
+        "volume",
+        "candle_structure",
+        "patterns",
+        "structure",
+        "session",
+        "regime",
+        "microstructure",
+        "correlation"
+      ],
+      "peer_symbols_loaded": [
+        "SPX500",
+        "US10Y",
+        "US30",
+        "USDJPY",
+        "USOIL"
+      ],
+      "data_snapshot": {
+        "timeframe": "D1",
+        "bars": 1510,
+        "start": "2019-01-02 00:00:00+00:00",
+        "end": "2024-12-31 00:00:00+00:00",
+        "source": "candle_repository_or_yahoo"
+      },
+      "costs": {
+        "slippage_pips": 2.0,
+        "commission_pips": 0.3
+      },
+      "results": {
+        "fold_1": {
+          "train_period": "2019-01-02 to 2022-12-30",
+          "test_period": "2023-01-03 to 2024-01-03",
+          "test_win_rate": 0.42857142857142855,
+          "test_sharpe": 0.0658912814473855,
+          "test_sortino": 0.08689840712240436,
+          "test_profit_factor": 1.1403967249077953,
+          "test_max_dd": -7.084402433563787,
+          "test_trades": 28,
+          "trades_per_week": 0.536986301369863,
+          "avg_trade_duration_hours": 0.0,
+          "train_accuracy": 0.5364238410596026,
+          "test_accuracy": 0.4715909090909091,
+          "overfitting_detected": false,
+          "accuracy_gap": 0.0648329319686935,
+          "significance": {
+            "is_significant": false,
+            "p_value": 0.8275357745587826,
+            "confidence": "95%",
+            "wins": 12,
+            "n_trades": 28,
+            "win_rate": 0.42857142857142855
+          },
+          "equity_end": 102241.2189421354,
+          "model_registration": {
+            "name": "XAUUSD_random_forest",
+            "version": "20260717T231708Z",
+            "path": "ai/artifacts/phase5b/models/models/XAUUSD_random_forest/20260717T231708Z",
+            "meta": {
+              "date": "2026-07-17T23:17:08.593805+00:00",
+              "metadata": {
+                "model_name": "XAUUSD_random_forest",
+                "project": "eTradeAI",
+                "registered_at": "2026-07-17T23:17:08.538597+00:00"
+              },
+              "model_file": "model.joblib",
+              "params": {},
+              "version": "20260717T231708Z"
+            },
+            "metrics": {
+              "accuracy": 0.5364238410596026,
+              "best_metric": 0.49551355479190523,
+              "duration_seconds": 0.47046923637390137,
+              "f1": 0.49551355479190523,
+              "test_accuracy": 0.48026315789473684,
+              "test_f1": 0.3804880565443946,
+              "val_accuracy": 0.5364238410596026,
+              "val_f1": 0.49551355479190523
+            },
+            "hashes": {
+              "features.json": "179dd9a50015c2f9b0a39f9cb0825a2b643b95a5372cd7345ca7c6607c65abc1",
+              "meta.json": "216bc6c8b059129fbfad7ec0c31d811e3eb378c6782f26fa867c3dbdd19bbf4f",
+              "metrics.json": "57ecb3fcdf3bd923a2e70eb199c15987d74ff671c3eb309cd363aac24e4a7940",
+              "model.joblib": "348476691a393cd2f26141023275d8f2f1e8069001e284abe9abd0f985733d87",
+              "scaler.json": "5e5640c9c438ddc049edf83c309057520444345ce42b91dcb51841af18da7a2e"
+            }
+          },
+          "feature_groups_active": [
+            "candle_structure",
+            "channels",
+            "correlation",
+            "microstructure",
+            "momentum",
+            "moving_averages",
+            "patterns",
+            "price",
+            "regime",
+            "returns",
+            "session",
+            "structure",
+            "volatility",
+            "volume"
+          ],
+          "generated_feature_groups": [
+            "price",
+            "moving_averages",
+            "momentum",
+            "volatility",
+            "volume",
+            "candle_structure",
+            "patterns",
+            "structure",
+            "session",
+            "regime",
+            "microstructure",
+            "correlation"
+          ],
+          "n_features": 474,
+          "peer_symbols": [
+            "SPX500",
+            "US10Y",
+            "US30",
+            "USDJPY",
+            "USOIL"
+          ],
+          "model_params": {
+            "model_type": "random_forest",
+            "random_seed": 42
+          },
+          "feature_importance_top10": {
+            "log_return_1": 0.0085465030612185,
+            "structure_channel_position_50": 0.00820549535768125,
+            "micro_bid_ask_ratio_sma_5": 0.008005452873271634,
+            "micro_spread_zscore_10": 0.007892676920060238,
+            "volume_ratio_10": 0.007571169801132903,
+            "volume_zscore_10": 0.007504507354481043,
+            "corr_us30_relative_return": 0.007212196181941833,
+            "volume_ratio_5": 0.007016683054462578,
+            "regime_trend_score_5": 0.00685891660829574,
+            "micro_spread_zscore_5": 0.00625121606601074
+          }
+        }
+      },
+      "aggregate": {
+        "avg_win_rate": 0.42857142857142855,
+        "std_win_rate": 0.0,
+        "avg_sharpe": 0.0658912814473855,
+        "avg_sortino": 0.08689840712240436,
+        "avg_profit_factor": 1.1403967249077953,
+        "avg_max_dd": -7.084402433563787,
+        "total_trades": 28,
+        "folds_significant": 0,
+        "overfitting_folds": 0,
+        "regime_stable": true,
+        "early_fold_sharpe": 0.0658912814473855,
+        "late_fold_sharpe": 0.0658912814473855,
+        "correlation_decay_per_fold": 0.0,
+        "overall_significant": false,
+        "pooled_significance": {
+          "is_significant": false,
+          "p_value": 0.8275357745587826,
+          "confidence": "95%",
+          "wins": 12,
+          "n_trades": 28,
+          "win_rate": 0.42857142857142855
+        },
+        "failures": [
+          "win_rate_or_significance",
+          "sharpe",
+          "profit_factor"
+        ],
+        "recommendation": "NO ROBUST EDGE - Do NOT proceed to Phase 5b. Failed: win_rate_or_significance, sharpe, profit_factor. Suggestions: review labels/features, increase sample, reduce model complexity, re-check costs, or extend real history coverage.",
+        "symbol": "XAUUSD",
+        "timeframe": "D1",
+        "multi_tf": false
+      }
+    },
+    {
+      "symbol": "XAUUSD",
+      "timeframe": "M15+H1+H4",
+      "period": "2019-01-01 to 2024-12-31",
+      "actual_data_period": "2026-05-06 to 2026-07-17",
+      "train_folds": 1,
+      "multi_tf": true,
+      "advanced_features": true,
+      "feature_groups_active": [
+        "price",
+        "returns",
+        "moving_averages",
+        "momentum",
+        "volatility",
+        "channels",
+        "volume",
+        "candle_structure",
+        "patterns",
+        "structure",
+        "session",
+        "regime",
+        "microstructure",
+        "correlation"
+      ],
+      "peer_symbols_loaded": [
+        "SPX500",
+        "US10Y",
+        "US30",
+        "USDJPY",
+        "USOIL"
+      ],
+      "data_snapshot": {
+        "timeframe": "M15",
+        "bars": 4600,
+        "start": "2026-05-06 04:00:00+00:00",
+        "end": "2026-07-17 20:45:00+00:00",
+        "source": "candle_repository_or_yahoo"
+      },
+      "costs": {
+        "slippage_pips": 2.0,
+        "commission_pips": 0.3
+      },
+      "results": {
+        "fold_1": {
+          "train_period": "2026-05-06 to 2026-07-03",
+          "test_period": "2026-07-05 to 2026-07-17",
+          "test_win_rate": 0.32142857142857145,
+          "test_sharpe": -7.74616646104471,
+          "test_sortino": -8.197398023443055,
+          "test_profit_factor": 0.669549805396553,
+          "test_max_dd": -10.259848017414466,
+          "test_trades": 28,
+          "trades_per_week": 17.81818181818182,
+          "avg_trade_duration_hours": 0.0,
+          "train_accuracy": 0.5081669691470054,
+          "test_accuracy": 0.5294117647058824,
+          "overfitting_detected": false,
+          "accuracy_gap": -0.021244795558876928,
+          "significance": {
+            "is_significant": false,
+            "p_value": 0.9821509309113026,
+            "confidence": "95%",
+            "wins": 9,
+            "n_trades": 28,
+            "win_rate": 0.32142857142857145
+          },
+          "equity_end": 93063.84596616321,
+          "model_registration": {
+            "name": "XAUUSD_random_forest",
+            "version": "20260717T231731Z",
+            "path": "ai/artifacts/phase5b/models/models/XAUUSD_random_forest/20260717T231731Z",
+            "meta": {
+              "date": "2026-07-17T23:17:31.820986+00:00",
+              "metadata": {
+                "model_name": "XAUUSD_random_forest",
+                "project": "eTradeAI",
+                "registered_at": "2026-07-17T23:17:31.760756+00:00"
+              },
+              "model_file": "model.joblib",
+              "params": {},
+              "version": "20260717T231731Z"
+            },
+            "metrics": {
+              "accuracy": 0.5081669691470054,
+              "best_metric": 0.48926513091512314,
+              "duration_seconds": 0.9879128932952881,
+              "f1": 0.48926513091512314,
+              "test_accuracy": 0.5479204339963833,
+              "test_f1": 0.5463048044106065,
+              "val_accuracy": 0.5081669691470054,
+              "val_f1": 0.48926513091512314
+            },
+            "hashes": {
+              "features.json": "179dd9a50015c2f9b0a39f9cb0825a2b643b95a5372cd7345ca7c6607c65abc1",
+              "meta.json": "bfbb4ee76e40814c7fa33a2c85e29fe24f3acc1ce0a3922d8d62fb81aad24424",
+              "metrics.json": "5d58ffb5e7a4c3a29338367f8c9b515eab8529d97080f620e1abf2389d1019a9",
+              "model.joblib": "cf99dd8d8ba592f9b4b3b894fef5053a2bca3e1ca708407f40783028fdd5dde7",
+              "scaler.json": "5e5640c9c438ddc049edf83c309057520444345ce42b91dcb51841af18da7a2e"
+            }
+          },
+          "feature_groups_active": [
+            "candle_structure",
+            "channels",
+            "correlation",
+            "microstructure",
+            "momentum",
+            "moving_averages",
+            "patterns",
+            "price",
+            "regime",
+            "returns",
+            "session",
+            "structure",
+            "volatility",
+            "volume"
+          ],
+          "generated_feature_groups": [
+            "price",
+            "moving_averages",
+            "momentum",
+            "volatility",
+            "volume",
+            "candle_structure",
+            "patterns",
+            "structure",
+            "session",
+            "regime",
+            "microstructure",
+            "correlation"
+          ],
+          "n_features": 474,
+          "peer_symbols": [
+            "SPX500",
+            "US10Y",
+            "US30",
+            "USDJPY",
+            "USOIL"
+          ],
+          "model_params": {
+            "model_type": "random_forest",
+            "random_seed": 42
+          },
+          "feature_importance_top10": {
+            "micro_ofi_zscore_5": 0.007501808295748925,
+            "micro_ofi_zscore_10": 0.007229077637169621,
+            "micro_order_flow_imbalance": 0.006915738361314046,
+            "micro_ofi_zscore_20": 0.006674945908640779,
+            "candle_close_location": 0.006280683062635673,
+            "micro_ofi_zscore_50": 0.0062420508773136825,
+            "regime_efficiency_ratio_10": 0.006090855599430608,
+            "session_close_location": 0.005979285657388929,
+            "session_dist_from_low": 0.005877393650596306,
+            "micro_bid_ask_ratio_sma_10": 0.0057491038314571455
+          }
+        }
+      },
+      "aggregate": {
+        "avg_win_rate": 0.32142857142857145,
+        "std_win_rate": 0.0,
+        "avg_sharpe": -7.74616646104471,
+        "avg_sortino": -8.197398023443055,
+        "avg_profit_factor": 0.669549805396553,
+        "avg_max_dd": -10.259848017414466,
+        "total_trades": 28,
+        "folds_significant": 0,
+        "overfitting_folds": 0,
+        "regime_stable": true,
+        "early_fold_sharpe": -7.74616646104471,
+        "late_fold_sharpe": -7.74616646104471,
+        "correlation_decay_per_fold": 0.0,
+        "overall_significant": false,
+        "pooled_significance": {
+          "is_significant": false,
+          "p_value": 0.9821509309113026,
+          "confidence": "95%",
+          "wins": 9,
+          "n_trades": 28,
+          "win_rate": 0.32142857142857145
+        },
+        "failures": [
+          "win_rate_or_significance",
+          "sharpe",
+          "profit_factor"
+        ],
+        "recommendation": "NO ROBUST EDGE - Do NOT proceed to Phase 5b. Failed: win_rate_or_significance, sharpe, profit_factor. Suggestions: review labels/features, increase sample, reduce model complexity, re-check costs, or extend real history coverage.",
+        "symbol": "XAUUSD",
+        "timeframe": "M15",
+        "multi_tf": true
+      }
+    }
+  ],
+  "summary": {
+    "symbols_evaluated": [
+      "EURUSD",
+      "GBPUSD",
+      "USDJPY",
+      "XAUUSD"
+    ],
+    "symbols_with_edge": [],
+    "symbols_passed": 0,
+    "symbols_required": 3,
+    "proceed_to_phase_5b": false,
+    "answer": "NO \u2014 advanced features did not create an exploitable edge on these symbols.",
+    "per_symbol": {
+      "EURUSD": false,
+      "GBPUSD": false,
+      "USDJPY": false,
+      "XAUUSD": false
+    },
+    "proceed_to_phase_5c": false,
+    "decision": "NO_EDGE_DETECTED",
+    "comparison_table": [
+      {
+        "symbol": "EURUSD",
+        "phase5a_wr": 0.5,
+        "phase5b_wr": 0.5227272727272727,
+        "delta_wr": 0.022727272727272707,
+        "phase5a_sharpe": 0.30584073981120463,
+        "phase5b_sharpe": 0.39921684332875007,
+        "delta_sharpe": 0.09337610351754544,
+        "phase5a_pf": 1.5739634664480082,
+        "phase5b_pf": 1.742818051075651,
+        "delta_pf": 0.1688545846276428,
+        "phase5a_max_dd": -4.203436700345212,
+        "phase5b_max_dd": -4.203436700345212,
+        "delta_max_dd": 0.0,
+        "flags": [
+          "notable_wr_improvement"
+        ],
+        "timeframe": "D1",
+        "phase5b_passes_gate": false,
+        "phase5a_failures": [
+          "win_rate_or_significance",
+          "sharpe"
+        ],
+        "phase5b_failures": [
+          "win_rate_or_significance",
+          "sharpe"
+        ]
+      },
+      {
+        "symbol": "GBPUSD",
+        "phase5a_wr": 0.5416666666666667,
+        "phase5b_wr": 0.5416666666666667,
+        "delta_wr": 0.0,
+        "phase5a_sharpe": 0.4684365517630597,
+        "phase5b_sharpe": 0.4679064508291185,
+        "delta_sharpe": -0.00053010093394118,
+        "phase5a_pf": 1.7527062538062306,
+        "phase5b_pf": 1.7224115051183664,
+        "delta_pf": -0.030294748687864193,
+        "phase5a_max_dd": -3.954229831418685,
+        "phase5b_max_dd": -3.9541998564923535,
+        "delta_max_dd": 2.997492633127763e-05,
+        "flags": [],
+        "timeframe": "D1",
+        "phase5b_passes_gate": false,
+        "phase5a_failures": [
+          "win_rate_or_significance",
+          "sharpe"
+        ],
+        "phase5b_failures": [
+          "win_rate_or_significance",
+          "sharpe"
+        ]
+      },
+      {
+        "symbol": "USDJPY",
+        "phase5a_wr": 0.6083333333333334,
+        "phase5b_wr": 0.5333333333333333,
+        "delta_wr": -0.07500000000000007,
+        "phase5a_sharpe": 1.0008952463257652,
+        "phase5b_sharpe": 0.6035572937344414,
+        "delta_sharpe": -0.39733795259132376,
+        "phase5a_pf": 2.812720860554428,
+        "phase5b_pf": 1.7145322432138803,
+        "delta_pf": -1.0981886173405475,
+        "phase5a_max_dd": -4.498596253272563,
+        "phase5b_max_dd": -4.67860408835401,
+        "delta_max_dd": -0.18000783508144735,
+        "flags": [
+          "warning_wr_regression"
+        ],
+        "timeframe": "D1",
+        "phase5b_passes_gate": false,
+        "phase5a_failures": [
+          "win_rate_or_significance",
+          "regime_unstable"
+        ],
+        "phase5b_failures": [
+          "win_rate_or_significance",
+          "regime_unstable"
+        ]
+      },
+      {
+        "symbol": "XAUUSD",
+        "phase5a_wr": 0.4074074074074074,
+        "phase5b_wr": 0.42857142857142855,
+        "delta_wr": 0.021164021164021163,
+        "phase5a_sharpe": -0.1300246658607532,
+        "phase5b_sharpe": 0.0658912814473855,
+        "delta_sharpe": 0.19591594730813872,
+        "phase5a_pf": 1.0562008649775079,
+        "phase5b_pf": 1.1403967249077953,
+        "delta_pf": 0.08419585993028744,
+        "phase5a_max_dd": -5.927861258057162,
+        "phase5b_max_dd": -7.084402433563787,
+        "delta_max_dd": -1.156541175506625,
+        "flags": [
+          "notable_wr_improvement"
+        ],
+        "timeframe": "D1",
+        "phase5b_passes_gate": false,
+        "phase5a_failures": [
+          "win_rate_or_significance",
+          "sharpe",
+          "profit_factor"
+        ],
+        "phase5b_failures": [
+          "win_rate_or_significance",
+          "sharpe",
+          "profit_factor"
+        ]
+      }
+    ],
+    "feature_importance": {
+      "top10_aggregate": {
+        "micro_sell_volume": 0.3408185324231787,
+        "micro_clv": 0.283073165763428,
+        "candle_lower_wick_ratio": 0.27896116108385277,
+        "candle_close_location": 0.264104527849509,
+        "micro_buy_volume": 0.2491542982677933,
+        "micro_order_flow_imbalance": 0.23295579022855964,
+        "candle_upper_wick_ratio": 0.2181438349126737,
+        "candle_open_location": 0.18021380581371757,
+        "micro_bid_ask_ratio": 0.17865505180701732,
+        "micro_ofi_zscore_10": 0.14620049201754917
+      },
+      "advanced_group_importance": {
+        "microstructure": 1.8296651258901744,
+        "regime": 0.0804649314085428,
+        "correlation": 0.13224827580606358,
+        "session": 0.10192359826647474,
+        "volatility": 0.0
+      },
+      "per_symbol_top10": {
+        "EURUSD": {
+          "micro_sell_volume": 0.11553453448838474,
+          "candle_lower_wick_ratio": 0.09493898320062864,
+          "micro_clv": 0.0908901067999674,
+          "micro_buy_volume": 0.08213685981649019,
+          "candle_close_location": 0.07604747338425871,
+          "micro_order_flow_imbalance": 0.07464360260006439,
+          "candle_upper_wick_ratio": 0.07447653823629805,
+          "candle_open_location": 0.0713936512542398,
+          "micro_bid_ask_ratio": 0.07108432736160314,
+          "pattern_directional_score": 0.038976616550700144
+        },
+        "GBPUSD": {
+          "micro_sell_volume": 0.1077558332099218,
+          "micro_clv": 0.0940128757764262,
+          "micro_buy_volume": 0.08313595426442791,
+          "candle_lower_wick_ratio": 0.08231107647977198,
+          "candle_close_location": 0.08164582009873006,
+          "micro_bid_ask_ratio": 0.07154601431486335,
+          "micro_order_flow_imbalance": 0.06889699400752305,
+          "candle_upper_wick_ratio": 0.06295526862763672,
+          "candle_open_location": 0.06041063085253612,
+          "micro_ofi_zscore_5": 0.03493409415404616
+        },
+        "USDJPY": {
+          "micro_sell_volume": 0.11110408336961508,
+          "candle_lower_wick_ratio": 0.10171110140345217,
+          "micro_ofi_zscore_10": 0.09960611657143668,
+          "micro_clv": 0.09817018318703444,
+          "candle_close_location": 0.09384986824124886,
+          "micro_buy_volume": 0.08388148418687519,
+          "candle_upper_wick_ratio": 0.08071202804873896,
+          "micro_order_flow_imbalance": 0.07558371689834412,
+          "micro_ofi_zscore_20": 0.053606586244350336,
+          "candle_open_location": 0.04840952370694165
+        },
+        "XAUUSD": {
+          "session_close_location": 0.018842667098486372,
+          "micro_ofi_zscore_5": 0.01500361659149785,
+          "micro_ofi_zscore_10": 0.014458155274339243,
+          "micro_order_flow_imbalance": 0.013831476722628092,
+          "micro_ofi_zscore_20": 0.013349891817281558,
+          "candle_close_location": 0.012561366125271346,
+          "micro_ofi_zscore_50": 0.012484101754627365,
+          "regime_efficiency_ratio_10": 0.012181711198861215,
+          "ichimoku_cloud_width": 0.011930456293556263,
+          "session_dist_from_low": 0.011754787301192612
+        }
+      },
+      "new_features_helped_most": [
+        [
+          "microstructure",
+          1.8296651258901744
+        ],
+        [
+          "correlation",
+          0.13224827580606358
+        ],
+        [
+          "session",
+          0.10192359826647474
+        ],
+        [
+          "regime",
+          0.0804649314085428
+        ],
+        [
+          "volatility",
+          0.0
+        ]
+      ]
+    }
+  },
+  "deltas": [
+    {
+      "symbol": "EURUSD",
+      "phase5a_wr": 0.5,
+      "phase5b_wr": 0.5227272727272727,
+      "delta_wr": 0.022727272727272707,
+      "phase5a_sharpe": 0.30584073981120463,
+      "phase5b_sharpe": 0.39921684332875007,
+      "delta_sharpe": 0.09337610351754544,
+      "phase5a_pf": 1.5739634664480082,
+      "phase5b_pf": 1.742818051075651,
+      "delta_pf": 0.1688545846276428,
+      "phase5a_max_dd": -4.203436700345212,
+      "phase5b_max_dd": -4.203436700345212,
+      "delta_max_dd": 0.0,
+      "flags": [
+        "notable_wr_improvement"
+      ],
+      "timeframe": "D1",
+      "phase5b_passes_gate": false,
+      "phase5a_failures": [
+        "win_rate_or_significance",
+        "sharpe"
+      ],
+      "phase5b_failures": [
+        "win_rate_or_significance",
+        "sharpe"
+      ]
+    },
+    {
+      "symbol": "GBPUSD",
+      "phase5a_wr": 0.5416666666666667,
+      "phase5b_wr": 0.5416666666666667,
+      "delta_wr": 0.0,
+      "phase5a_sharpe": 0.4684365517630597,
+      "phase5b_sharpe": 0.4679064508291185,
+      "delta_sharpe": -0.00053010093394118,
+      "phase5a_pf": 1.7527062538062306,
+      "phase5b_pf": 1.7224115051183664,
+      "delta_pf": -0.030294748687864193,
+      "phase5a_max_dd": -3.954229831418685,
+      "phase5b_max_dd": -3.9541998564923535,
+      "delta_max_dd": 2.997492633127763e-05,
+      "flags": [],
+      "timeframe": "D1",
+      "phase5b_passes_gate": false,
+      "phase5a_failures": [
+        "win_rate_or_significance",
+        "sharpe"
+      ],
+      "phase5b_failures": [
+        "win_rate_or_significance",
+        "sharpe"
+      ]
+    },
+    {
+      "symbol": "USDJPY",
+      "phase5a_wr": 0.6083333333333334,
+      "phase5b_wr": 0.5333333333333333,
+      "delta_wr": -0.07500000000000007,
+      "phase5a_sharpe": 1.0008952463257652,
+      "phase5b_sharpe": 0.6035572937344414,
+      "delta_sharpe": -0.39733795259132376,
+      "phase5a_pf": 2.812720860554428,
+      "phase5b_pf": 1.7145322432138803,
+      "delta_pf": -1.0981886173405475,
+      "phase5a_max_dd": -4.498596253272563,
+      "phase5b_max_dd": -4.67860408835401,
+      "delta_max_dd": -0.18000783508144735,
+      "flags": [
+        "warning_wr_regression"
+      ],
+      "timeframe": "D1",
+      "phase5b_passes_gate": false,
+      "phase5a_failures": [
+        "win_rate_or_significance",
+        "regime_unstable"
+      ],
+      "phase5b_failures": [
+        "win_rate_or_significance",
+        "regime_unstable"
+      ]
+    },
+    {
+      "symbol": "XAUUSD",
+      "phase5a_wr": 0.4074074074074074,
+      "phase5b_wr": 0.42857142857142855,
+      "delta_wr": 0.021164021164021163,
+      "phase5a_sharpe": -0.1300246658607532,
+      "phase5b_sharpe": 0.0658912814473855,
+      "delta_sharpe": 0.19591594730813872,
+      "phase5a_pf": 1.0562008649775079,
+      "phase5b_pf": 1.1403967249077953,
+      "delta_pf": 0.08419585993028744,
+      "phase5a_max_dd": -5.927861258057162,
+      "phase5b_max_dd": -7.084402433563787,
+      "delta_max_dd": -1.156541175506625,
+      "flags": [
+        "notable_wr_improvement"
+      ],
+      "timeframe": "D1",
+      "phase5b_passes_gate": false,
+      "phase5a_failures": [
+        "win_rate_or_significance",
+        "sharpe",
+        "profit_factor"
+      ],
+      "phase5b_failures": [
+        "win_rate_or_significance",
+        "sharpe",
+        "profit_factor"
+      ]
+    }
+  ],
+  "decision": {
+    "decision": "NO_EDGE_DETECTED",
+    "proceed_to_phase_5c": false,
+    "symbols_for_phase_5c": [],
+    "symbols_passed": 0,
+    "symbols_required_full": 4,
+    "symbols_required_partial": 3,
+    "max_delta_sharpe": 0.19591594730813872,
+    "symbols_with_promising_delta": [],
+    "rationale": "Advanced features did not create a robust edge. Consider Option C (different markets) or Option D (pivot).",
+    "answer": "NO \u2014 advanced features did not create an exploitable edge on these symbols."
+  }
+}
