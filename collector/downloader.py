@@ -23,6 +23,7 @@ from typing import Dict, List, Optional, Tuple, Generator
 from enum import Enum
 import time
 from pathlib import Path
+from uuid import uuid4
 
 try:
     import MetaTrader5 as mt5
@@ -373,50 +374,47 @@ class DatabaseOperations:
         Fetch all markets from database.
         
         Returns:
-            List of market dictionaries with id and name.
+            List of market dictionaries with id and name/symbol.
         """
         cursor = self.db.cursor()
         try:
-            cursor.execute("SELECT id, name FROM markets WHERE active = 1")
+            cursor.execute(
+                """
+                SELECT market_id, COALESCE(name, symbol) AS name, symbol
+                FROM markets
+                WHERE COALESCE(active, 1) = 1
+                  AND COALESCE(status, 'active') = 'active'
+                """
+            )
             rows = cursor.fetchall()
             return [
-                {"id": row[0], "name": row[1]}
+                {"id": row[0], "name": row[1] or row[2], "symbol": row[2]}
                 for row in rows
             ]
         except sqlite3.OperationalError as e:
             logger.error(f"Error fetching markets: {e}")
             return []
 
+
     def get_sync_status(
         self,
         market_id: int,
         timeframe: str,
     ) -> SyncRecord:
-        """
-        Fetch sync status for a market/timeframe pair.
-        
-        Args:
-            market_id: Market ID
-            timeframe: Timeframe string (e.g., "H1")
-            
-        Returns:
-            SyncRecord with current status.
-        """
+        """Fetch sync status for a market/timeframe pair."""
         cursor = self.db.cursor()
         try:
             cursor.execute(
                 """
-                SELECT m.id, m.name, tf.name, ss.status, 
+                SELECT m.market_id, COALESCE(m.name, m.symbol), ss.timeframe, ss.status,
                        ss.last_synced, ss.last_candle_time, ss.candles_count
                 FROM sync_status ss
-                JOIN markets m ON ss.market_id = m.id
-                JOIN timeframes tf ON ss.timeframe_id = tf.id
-                WHERE ss.market_id = ? AND tf.name = ?
+                JOIN markets m ON ss.market_id = m.market_id
+                WHERE ss.market_id = ? AND ss.timeframe = ?
                 """,
                 (market_id, timeframe),
             )
             row = cursor.fetchone()
-
             if row:
                 return SyncRecord(
                     market_id=row[0],
@@ -427,10 +425,8 @@ class DatabaseOperations:
                     last_candle_time=row[5],
                     candles_count=row[6],
                 )
-
-            # No sync record exists, return pending
             cursor.execute(
-                "SELECT id, name FROM markets WHERE id = ?",
+                "SELECT market_id, COALESCE(name, symbol) FROM markets WHERE market_id = ?",
                 (market_id,),
             )
             market_row = cursor.fetchone()
@@ -445,10 +441,27 @@ class DatabaseOperations:
                     candles_count=0,
                 )
             return None
-
         except sqlite3.OperationalError as e:
             logger.error(f"Error fetching sync status: {e}")
             return None
+
+    def _resolve_symbol(self, market_id: int) -> Optional[str]:
+        cursor = self.db.cursor()
+        cursor.execute("SELECT symbol FROM markets WHERE market_id = ?", (market_id,))
+        row = cursor.fetchone()
+        return row[0] if row else None
+
+    def _resolve_broker_id(self, market_id: int) -> Optional[int]:
+        cursor = self.db.cursor()
+        cursor.execute("SELECT broker_id FROM markets WHERE market_id = ?", (market_id,))
+        row = cursor.fetchone()
+        return int(row[0]) if row and row[0] is not None else None
+
+    def _resolve_timeframe_name(self, timeframe_id: int) -> Optional[str]:
+        cursor = self.db.cursor()
+        cursor.execute("SELECT name FROM timeframes WHERE timeframe_id = ?", (timeframe_id,))
+        row = cursor.fetchone()
+        return row[0] if row else None
 
     def insert_candles(
         self,
@@ -456,44 +469,56 @@ class DatabaseOperations:
         timeframe_id: int,
         candles: List[Candle],
     ) -> int:
-        """
-        Insert candles into database using batch insert with
-        duplicate detection.
-        
-        Args:
-            market_id: Market ID
-            timeframe_id: Timeframe ID
-            candles: List of Candle objects
-            
-        Returns:
-            Number of candles actually inserted.
-        """
+        """Insert candles using the canonical candle schema."""
         if not candles:
             return 0
-
+        symbol = self._resolve_symbol(market_id)
+        timeframe = self._resolve_timeframe_name(timeframe_id)
+        broker_id = self._resolve_broker_id(market_id)
+        if not symbol or not timeframe:
+            logger.error("Cannot insert candles: unresolved market/timeframe ids")
+            return 0
         cursor = self.db.cursor()
         inserted = 0
-
+        now = datetime.utcnow().isoformat(timespec="seconds")
         try:
-            # Use INSERT OR IGNORE to prevent duplicates
-            # This assumes a UNIQUE constraint on (market_id, timeframe_id, time)
             for candle in candles:
+                ts = candle.time
+                if isinstance(ts, (int, float)):
+                    ts_value = datetime.utcfromtimestamp(int(ts)).isoformat(timespec="seconds")
+                elif isinstance(ts, datetime):
+                    ts_value = ts.isoformat(timespec="seconds")
+                else:
+                    ts_value = str(ts)
                 cursor.execute(
                     """
                     INSERT OR IGNORE INTO candles
-                    (market_id, timeframe_id, time, open, high, low, close,
-                     tick_volume, spread, real_volume, flags)
-                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                    (candle_uuid, symbol, timeframe, timestamp, open, high, low, close,
+                     volume, market_id, broker_id, spread, tick_volume, status, metadata, created_at, updated_at)
+                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'active', '{}', ?, ?)
                     """,
-                    (market_id, timeframe_id, *candle.to_tuple()),
+                    (
+                        str(uuid4()),
+                        symbol,
+                        timeframe,
+                        ts_value,
+                        candle.open,
+                        candle.high,
+                        candle.low,
+                        candle.close,
+                        float(getattr(candle, "real_volume", 0) or getattr(candle, "tick_volume", 0) or 0),
+                        market_id,
+                        broker_id,
+                        getattr(candle, "spread", None),
+                        getattr(candle, "tick_volume", None),
+                        now,
+                        now,
+                    ),
                 )
                 if cursor.rowcount > 0:
                     inserted += 1
-
             self.db.commit()
-            logger.debug(f"Inserted {inserted}/{len(candles)} candles")
             return inserted
-
         except sqlite3.Error as e:
             self.db.rollback()
             logger.error(f"Error inserting candles: {e}")
@@ -508,64 +533,40 @@ class DatabaseOperations:
         candles_count: Optional[int] = None,
         error_message: Optional[str] = None,
     ) -> bool:
-        """
-        Update sync status for a market/timeframe pair.
-        
-        Args:
-            market_id: Market ID
-            timeframe_id: Timeframe ID
-            status: New status
-            last_candle_time: Timestamp of last candle
-            candles_count: Total candles for this pair
-            error_message: Error message if status is ERROR
-            
-        Returns:
-            True if update successful.
-        """
+        timeframe = self._resolve_timeframe_name(timeframe_id) or str(timeframe_id)
         cursor = self.db.cursor()
         try:
+            last_ts = last_candle_time
+            if isinstance(last_candle_time, (int, float)) and int(last_candle_time) > 10_000_000:
+                last_ts = datetime.utcfromtimestamp(int(last_candle_time)).isoformat(timespec="seconds")
             cursor.execute(
                 """
                 INSERT OR REPLACE INTO sync_status
-                (market_id, timeframe_id, status, last_synced,
+                (market_id, timeframe, status, last_synced,
                  last_candle_time, candles_count, error_message)
                 VALUES (?, ?, ?, ?, ?, ?, ?)
                 """,
                 (
                     market_id,
-                    timeframe_id,
+                    timeframe,
                     status.value,
                     datetime.now().isoformat(),
-                    last_candle_time,
+                    last_ts,
                     candles_count,
                     error_message,
                 ),
             )
             self.db.commit()
-            logger.debug(
-                f"Updated sync status: market={market_id}, "
-                f"timeframe={timeframe_id}, status={status.value}"
-            )
             return True
-
         except sqlite3.Error as e:
             self.db.rollback()
             logger.error(f"Error updating sync status: {e}")
             return False
 
     def get_timeframe_id(self, timeframe: str) -> Optional[int]:
-        """
-        Get timeframe ID from timeframe name.
-        
-        Args:
-            timeframe: Timeframe name (e.g., "H1")
-            
-        Returns:
-            Timeframe ID or None if not found.
-        """
         cursor = self.db.cursor()
         try:
-            cursor.execute("SELECT id FROM timeframes WHERE name = ?", (timeframe,))
+            cursor.execute("SELECT timeframe_id FROM timeframes WHERE name = ?", (timeframe,))
             row = cursor.fetchone()
             return row[0] if row else None
         except sqlite3.OperationalError as e:
@@ -577,27 +578,29 @@ class DatabaseOperations:
         market_id: int,
         timeframe_id: int,
     ) -> Optional[int]:
-        """
-        Get timestamp of last candle in database.
-        
-        Args:
-            market_id: Market ID
-            timeframe_id: Timeframe ID
-            
-        Returns:
-            Timestamp of last candle or None if no candles exist.
-        """
+        symbol = self._resolve_symbol(market_id)
+        timeframe = self._resolve_timeframe_name(timeframe_id)
+        if not symbol or not timeframe:
+            return None
         cursor = self.db.cursor()
         try:
             cursor.execute(
                 """
-                SELECT MAX(time) FROM candles
-                WHERE market_id = ? AND timeframe_id = ?
+                SELECT MAX(timestamp) FROM candles
+                WHERE market_id = ? AND timeframe = ? AND symbol = ?
                 """,
-                (market_id, timeframe_id),
+                (market_id, timeframe, symbol),
             )
             row = cursor.fetchone()
-            return row[0] if row and row[0] else None
+            if not row or row[0] is None:
+                return None
+            value = row[0]
+            if isinstance(value, (int, float)):
+                return int(value)
+            try:
+                return int(datetime.fromisoformat(str(value)).timestamp())
+            except ValueError:
+                return None
         except sqlite3.OperationalError as e:
             logger.error(f"Error fetching last candle time: {e}")
             return None
@@ -607,30 +610,25 @@ class DatabaseOperations:
         market_id: int,
         timeframe_id: int,
     ) -> int:
-        """
-        Get count of candles for a market/timeframe pair.
-        
-        Args:
-            market_id: Market ID
-            timeframe_id: Timeframe ID
-            
-        Returns:
-            Number of candles.
-        """
+        symbol = self._resolve_symbol(market_id)
+        timeframe = self._resolve_timeframe_name(timeframe_id)
+        if not symbol or not timeframe:
+            return 0
         cursor = self.db.cursor()
         try:
             cursor.execute(
                 """
                 SELECT COUNT(*) FROM candles
-                WHERE market_id = ? AND timeframe_id = ?
+                WHERE market_id = ? AND timeframe = ? AND symbol = ?
                 """,
-                (market_id, timeframe_id),
+                (market_id, timeframe, symbol),
             )
             row = cursor.fetchone()
-            return row[0] if row else 0
+            return int(row[0]) if row else 0
         except sqlite3.OperationalError as e:
             logger.error(f"Error counting candles: {e}")
             return 0
+
 
 
 # ==============================================================================
@@ -707,18 +705,27 @@ class Downloader:
 
     def __init__(
         self,
-        db_connection: sqlite3.Connection,
-        timeframes: Dict[str, int],
+        db_connection=None,
+        timeframes: Optional[Dict[str, int]] = None,
         config: Optional[Dict] = None,
     ):
         """
         Initialize downloader.
-        
-        Args:
-            db_connection: Active SQLite database connection
-            timeframes: Dict mapping timeframe names to MT5 constants
-            config: Optional configuration overrides
+
+        Accepts a raw sqlite3 connection, a Database object, or DatabaseManager.
+        ``timeframes`` defaults to core.config.TIMEFRAMES.
         """
+        if hasattr(db_connection, "get_connection") and not isinstance(db_connection, sqlite3.Connection):
+            conn = db_connection.get_connection()
+            # DatabaseManager.get_connection is a context manager
+            if hasattr(conn, "__enter__"):
+                conn = db_connection.get_adapter().connection if hasattr(db_connection.get_adapter(), "connection") else db_connection.connection
+            db_connection = conn if isinstance(conn, sqlite3.Connection) else getattr(db_connection, "connection", db_connection)
+        if hasattr(db_connection, "connection"):
+            db_connection = db_connection.connection
+        if timeframes is None:
+            from core.config import TIMEFRAMES
+            timeframes = dict(TIMEFRAMES)
         self.db = DatabaseOperations(db_connection)
         self.mt5_client = MT5Client()
         self.validator = CandleValidator()
@@ -738,6 +745,10 @@ class Downloader:
         self._total_downloaded = 0
         self._total_inserted = 0
         self._total_duplicates = 0
+
+    def download_all(self) -> bool:
+        """Compatibility alias used by main.py."""
+        return self.run()
 
     def run(self) -> bool:
         """

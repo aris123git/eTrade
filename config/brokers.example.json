@@ -1,0 +1,27 @@
+{
+  "mt5": [
+    {
+      "name": "ICMarkets",
+      "server": "ICMarketsSC-Demo",
+      "login": 12345678,
+      "password": "CHANGE_ME",
+      "path": "C:\\\\Program Files\\\\MetaTrader 5\\\\terminal64.exe"
+    },
+    {
+      "name": "PepperstoneMT5",
+      "server": "Pepperstone-Demo",
+      "login": 87654321,
+      "password": "CHANGE_ME"
+    }
+  ],
+  "csv": [
+    {
+      "name": "BrokerCSV_A",
+      "data_dir": "data/brokers/broker_a"
+    },
+    {
+      "name": "BrokerCSV_B",
+      "data_dir": "data/brokers/broker_b"
+    }
+  ]
+}

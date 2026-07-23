@@ -51,24 +51,15 @@ class RepositoryManager:
     
     # Registry of all repositories
     # Each entry: (name, repository_class, dependency_name)
-    # The dependency is resolved automatically at initialization
     REPOSITORIES: List[Tuple[str, Type[BaseRepository], Optional[str]]] = [
-        # ('markets', MarketRepository, None),
-        # ('candles', CandleRepository, None),
-        # ('brokers', BrokerRepository, None),
-        # ('currencies', CurrencyRepository, None),
-        # ('timeframes', TimeframeRepository, None),
-        # ('patterns', PatternRepository, None),
-        # ('correlations', CorrelationRepository, None),
-        # ('hypotheses', HypothesisRepository, None),
-        # ('knowledge', KnowledgeRepository, None),
-        # ('validation', ValidationRepository, None),
-        # ('trades', TradeRepository, None),
-        # ('positions', PositionRepository, None),
-        # ('orders', OrderRepository, None),
-        # ('accounts', AccountRepository, None),
-        # ('statistics', StatisticsRepository, None),
-        # ('cache', CacheRepository, None),
+        ('brokers', None, None),
+        ('currencies', None, None),
+        ('timeframes', None, None),
+        ('markets', None, None),
+        ('symbols', None, None),
+        ('candles', None, None),
+        ('ticks', None, None),
+        ('research', None, None),
     ]
     
     def __init__(self, db_manager: DatabaseManager):
@@ -127,36 +118,30 @@ class RepositoryManager:
         self._initialized = True
     
     def _lazy_imports(self):
-        """
-        Lazy import repositories to avoid circular imports.
-        
-        This is called before initialization to ensure all repository
-        classes are available.
-        """
-        # These imports will be uncommented as repositories are created
-        # from database.repositories.market_repository import MarketRepository
-        # from database.repositories.candle_repository import CandleRepository
-        # from database.repositories.broker_repository import BrokerRepository
-        # from database.repositories.currency_repository import CurrencyRepository
-        # from database.repositories.timeframe_repository import TimeframeRepository
-        # from database.repositories.pattern_repository import PatternRepository
-        # from database.repositories.correlation_repository import CorrelationRepository
-        # from database.repositories.hypothesis_repository import HypothesisRepository
-        # from database.repositories.knowledge_repository import KnowledgeRepository
-        # from database.repositories.validation_repository import ValidationRepository
-        # from database.repositories.trade_repository import TradeRepository
-        # from database.repositories.position_repository import PositionRepository
-        # from database.repositories.order_repository import OrderRepository
-        # from database.repositories.account_repository import AccountRepository
-        # from database.repositories.statistics_repository import StatisticsRepository
-        # from database.repositories.cache_repository import CacheRepository
-        
-        # If imports are commented, REPOSITORIES must be empty
-        if self.REPOSITORIES:
-            logger.warning(
-                "REPOSITORIES list is not empty but lazy imports are commented. "
-                "Uncomment the imports or remove REPOSITORIES entries."
-            )
+        """Lazy import repositories to avoid circular imports."""
+        from database.repositories.broker_repository import BrokerRepository
+        from database.repositories.candle_repository import CandleRepository
+        from database.repositories.currency_repository import CurrencyRepository
+        from database.repositories.market_repository import MarketRepository
+        from database.repositories.research_repository import ResearchRepository
+        from database.repositories.symbol_repository import SymbolRepository
+        from database.repositories.tick_repository import TickRepository
+        from database.repositories.timeframe_repository import TimeframeRepository
+
+        mapping = {
+            'brokers': BrokerRepository,
+            'currencies': CurrencyRepository,
+            'timeframes': TimeframeRepository,
+            'markets': MarketRepository,
+            'symbols': SymbolRepository,
+            'candles': CandleRepository,
+            'ticks': TickRepository,
+            'research': ResearchRepository,
+        }
+        updated = []
+        for name, _cls, dep in self.REPOSITORIES:
+            updated.append((name, mapping[name], dep))
+        self.REPOSITORIES = updated
     
     # ==========================================================================
     # PUBLIC METHODS

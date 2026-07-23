@@ -138,16 +138,22 @@ class CandleRepository(BaseRepository[Candle]):
         
         data = self._entity_to_dict(candle)
         data.pop('candle_id', None)
+        if data.get('broker_id') is None:
+            data['broker_id'] = 0
         
         fields = list(data.keys())
         placeholders = ", ".join("?" for _ in fields)
         field_names = ", ".join(fields)
-        update_clause = ", ".join(f"{f} = excluded.{f}" for f in fields if f not in ['symbol', 'timeframe', 'timestamp'])
+        update_clause = ", ".join(
+            f"{f} = excluded.{f}"
+            for f in fields
+            if f not in ['broker_id', 'symbol', 'timeframe', 'timestamp']
+        )
         
         sql = f"""
             INSERT INTO {self.TABLE} ({field_names})
             VALUES ({placeholders})
-            ON CONFLICT(symbol, timeframe, timestamp) DO UPDATE SET {update_clause}
+            ON CONFLICT(broker_id, symbol, timeframe, timestamp) DO UPDATE SET {update_clause}
             RETURNING candle_id
         """
         
@@ -216,19 +222,23 @@ class CandleRepository(BaseRepository[Candle]):
             symbol = c.get('symbol', '').upper()
             timeframe = c.get('timeframe', '').upper()
             symbols_timeframes.add((symbol, timeframe))
+            ts = c.get('timestamp', datetime.now())
+            if isinstance(ts, datetime):
+                ts = ts.isoformat(timespec="seconds")
             
             data_list.append({
                 'candle_uuid': str(uuid4()),
                 'symbol': symbol,
                 'timeframe': timeframe,
-                'timestamp': c.get('timestamp', datetime.now()),
+                'timestamp': ts,
                 'open': float(c.get('open', 0)),
                 'high': float(c.get('high', 0)),
                 'low': float(c.get('low', 0)),
                 'close': float(c.get('close', 0)),
                 'volume': float(c.get('volume', 0)),
                 'market_id': c.get('market_id'),
-                'broker_id': c.get('broker_id'),
+                # NULL broker_id breaks UNIQUE/ON CONFLICT matching in SQLite
+                'broker_id': c.get('broker_id') if c.get('broker_id') is not None else 0,
                 'spread': c.get('spread'),
                 'tick_volume': c.get('tick_volume'),
                 'status': c.get('status', CandleStatus.ACTIVE.value),
@@ -240,13 +250,16 @@ class CandleRepository(BaseRepository[Candle]):
         fields = list(data_list[0].keys())
         placeholders = ", ".join("?" for _ in fields)
         field_names = ", ".join(fields)
-        update_fields = [f for f in fields if f not in ['symbol', 'timeframe', 'timestamp'] and f != 'candle_uuid']
+        update_fields = [
+            f for f in fields
+            if f not in ['broker_id', 'symbol', 'timeframe', 'timestamp'] and f != 'candle_uuid'
+        ]
         update_clause = ", ".join(f"{f} = excluded.{f}" for f in update_fields)
         
         sql = f"""
             INSERT INTO {self.TABLE} ({field_names})
             VALUES ({placeholders})
-            ON CONFLICT(symbol, timeframe, timestamp) DO UPDATE SET {update_clause}
+            ON CONFLICT(broker_id, symbol, timeframe, timestamp) DO UPDATE SET {update_clause}
         """
         
         params = [tuple(d.values()) for d in data_list]
@@ -265,13 +278,16 @@ class CandleRepository(BaseRepository[Candle]):
                 fields = list(data.keys())
                 placeholders = ", ".join("?" for _ in fields)
                 field_names = ", ".join(fields)
-                update_fields = [f for f in fields if f not in ['symbol', 'timeframe', 'timestamp']]
+                update_fields = [
+                    f for f in fields
+                    if f not in ['broker_id', 'symbol', 'timeframe', 'timestamp']
+                ]
                 update_clause = ", ".join(f"{f} = excluded.{f}" for f in update_fields)
                 
                 sql = f"""
                     INSERT INTO {self.TABLE} ({field_names})
                     VALUES ({placeholders})
-                    ON CONFLICT(symbol, timeframe, timestamp) DO UPDATE SET {update_clause}
+                    ON CONFLICT(broker_id, symbol, timeframe, timestamp) DO UPDATE SET {update_clause}
                 """
                 
                 self.adapter.execute(sql, tuple(data.values()))
@@ -310,7 +326,7 @@ class CandleRepository(BaseRepository[Candle]):
             AND timestamp BETWEEN ? AND ?
             AND status = ?
         """
-        params = [symbol.upper(), timeframe.upper(), start_time, end_time, CandleStatus.ACTIVE.value]
+        params = [symbol.upper(), timeframe.upper(), self._sql_ts(start_time), self._sql_ts(end_time), CandleStatus.ACTIVE.value]
         
         if after_timestamp:
             if order == "ASC":
@@ -346,14 +362,14 @@ class CandleRepository(BaseRepository[Candle]):
         """Check if a candle exists."""
         return self.count(
             "symbol = ? AND timeframe = ? AND timestamp = ? AND status = ?",
-            (symbol.upper(), timeframe.upper(), timestamp, CandleStatus.ACTIVE.value)
+            (symbol.upper(), timeframe.upper(), self._sql_ts(timestamp), CandleStatus.ACTIVE.value)
         ) > 0
     
     def count_between(self, symbol: str, timeframe: str, start_time: datetime, end_time: datetime) -> int:
         """Count candles between two dates."""
         return self.count(
             "symbol = ? AND timeframe = ? AND timestamp BETWEEN ? AND ? AND status = ?",
-            (symbol.upper(), timeframe.upper(), start_time, end_time, CandleStatus.ACTIVE.value)
+            (symbol.upper(), timeframe.upper(), self._sql_ts(start_time), self._sql_ts(end_time), CandleStatus.ACTIVE.value)
         )
     
     def first_timestamp(self, symbol: str, timeframe: str) -> Optional[datetime]:
@@ -474,6 +490,14 @@ class CandleRepository(BaseRepository[Candle]):
         
         return result
     
+
+    @staticmethod
+    def _sql_ts(value):
+        """Normalize datetimes to ISO-8601 text for SQLite comparisons."""
+        if isinstance(value, datetime):
+            return value.isoformat(timespec="seconds")
+        return value
+
     # ==========================================================================
     # STREAMING
     # ==========================================================================
@@ -496,18 +520,20 @@ class CandleRepository(BaseRepository[Candle]):
         
         if order == "ASC":
             last_timestamp = start_time
+            first_page = True
             while True:
+                op = ">=" if first_page else ">"
                 sql = f"""
                     SELECT * FROM {self.TABLE} 
                     WHERE symbol = ? 
                     AND timeframe = ? 
-                    AND timestamp >= ?
+                    AND timestamp {op} ?
                     AND timestamp <= ?
                     AND status = ?
                     ORDER BY timestamp ASC
                     LIMIT {batch_size}
                 """
-                params = (symbol.upper(), timeframe.upper(), last_timestamp, end_time, CandleStatus.ACTIVE.value)
+                params = (symbol.upper(), timeframe.upper(), self._sql_ts(last_timestamp), self._sql_ts(end_time), CandleStatus.ACTIVE.value)
                 
                 rows = self.adapter.fetch_all(sql, params)
                 if not rows:
@@ -518,24 +544,25 @@ class CandleRepository(BaseRepository[Candle]):
                     last_timestamp = candle.timestamp
                     yield candle
                 
+                first_page = False
                 if len(rows) < batch_size:
                     break
-                
-                last_timestamp = candle.timestamp + timedelta(microseconds=1)
         else:
             last_timestamp = end_time
+            first_page = True
             while True:
+                op = "<=" if first_page else "<"
                 sql = f"""
                     SELECT * FROM {self.TABLE} 
                     WHERE symbol = ? 
                     AND timeframe = ? 
                     AND timestamp >= ?
-                    AND timestamp <= ?
+                    AND timestamp {op} ?
                     AND status = ?
                     ORDER BY timestamp DESC
                     LIMIT {batch_size}
                 """
-                params = (symbol.upper(), timeframe.upper(), start_time, last_timestamp, CandleStatus.ACTIVE.value)
+                params = (symbol.upper(), timeframe.upper(), self._sql_ts(start_time), self._sql_ts(last_timestamp), CandleStatus.ACTIVE.value)
                 
                 rows = self.adapter.fetch_all(sql, params)
                 if not rows:
@@ -546,10 +573,9 @@ class CandleRepository(BaseRepository[Candle]):
                     last_timestamp = candle.timestamp
                     yield candle
                 
+                first_page = False
                 if len(rows) < batch_size:
                     break
-                
-                last_timestamp = candle.timestamp - timedelta(microseconds=1)
     
     # ==========================================================================
     # AGGREGATION
@@ -600,7 +626,7 @@ class CandleRepository(BaseRepository[Candle]):
             WHERE symbol = ? AND timeframe = ? 
             AND timestamp BETWEEN ? AND ? 
             AND status = ?
-        """, (symbol.upper(), timeframe.upper(), start_time, end_time, CandleStatus.ACTIVE.value))
+        """, (symbol.upper(), timeframe.upper(), self._sql_ts(start_time), self._sql_ts(end_time), CandleStatus.ACTIVE.value))
         
         return row['total_volume'] if row and row['total_volume'] else 0.0
     
@@ -752,12 +778,21 @@ class CandleRepository(BaseRepository[Candle]):
     
     def _entity_to_dict(self, candle: Candle) -> Dict[str, Any]:
         """Convert Candle entity to dictionary."""
+        ts = candle.timestamp
+        if isinstance(ts, datetime):
+            ts = ts.isoformat(timespec="seconds")
+        created = candle.created_at
+        updated = candle.updated_at
+        if isinstance(created, datetime):
+            created = created.isoformat(timespec="seconds")
+        if isinstance(updated, datetime):
+            updated = updated.isoformat(timespec="seconds")
         return {
             'candle_id': candle.candle_id,
             'candle_uuid': candle.candle_uuid,
             'symbol': candle.symbol,
             'timeframe': candle.timeframe,
-            'timestamp': candle.timestamp,
+            'timestamp': ts,
             'open': candle.open,
             'high': candle.high,
             'low': candle.low,
@@ -769,18 +804,27 @@ class CandleRepository(BaseRepository[Candle]):
             'tick_volume': candle.tick_volume,
             'status': candle.status.value if candle.status else None,
             'metadata': json.dumps(candle.metadata) if candle.metadata else '{}',
-            'created_at': candle.created_at,
-            'updated_at': candle.updated_at,
+            'created_at': created,
+            'updated_at': updated,
         }
     
     def _row_to_entity(self, row: Dict[str, Any]) -> Candle:
         """Convert database row to Candle entity."""
+        ts = row['timestamp']
+        if isinstance(ts, str):
+            ts = datetime.fromisoformat(ts)
+        created = row.get('created_at')
+        updated = row.get('updated_at')
+        if isinstance(created, str):
+            created = datetime.fromisoformat(created)
+        if isinstance(updated, str):
+            updated = datetime.fromisoformat(updated)
         return Candle(
             candle_id=row['candle_id'],
             candle_uuid=row['candle_uuid'],
             symbol=row['symbol'],
             timeframe=row['timeframe'],
-            timestamp=row['timestamp'],
+            timestamp=ts,
             open=row['open'],
             high=row['high'],
             low=row['low'],
@@ -792,8 +836,8 @@ class CandleRepository(BaseRepository[Candle]):
             tick_volume=row['tick_volume'],
             status=CandleStatus(row['status']) if row['status'] else None,
             metadata=json.loads(row['metadata']) if row['metadata'] else {},
-            created_at=row['created_at'],
-            updated_at=row['updated_at'],
+            created_at=created,
+            updated_at=updated,
         )
     
     def _get_id(self, candle: Candle) -> int:

@@ -81,6 +81,7 @@ class MarketRepository(BaseRepository[Market]):
         contract_size: float = 1.0,
         metadata: Optional[Dict[str, Any]] = None,
         status: MarketStatus = MarketStatus.ACTIVE,
+        canonical_symbol: Optional[str] = None,
     ) -> Market:
         """
         Create a new market.
@@ -98,10 +99,14 @@ class MarketRepository(BaseRepository[Market]):
             contract_size: Contract size
             metadata: Additional metadata
             status: Market status
+            canonical_symbol: Cross-broker instrument key
             
         Returns:
             Created Market object
         """
+        from core.symbol_identity import canonicalize
+
+        ident = canonicalize(symbol)
         market = Market(
             market_id=None,
             broker_id=broker_id,
@@ -109,12 +114,13 @@ class MarketRepository(BaseRepository[Market]):
             market_type=market_type,
             status=status,
             description=description,
-            base_currency=base_currency,
-            quote_currency=quote_currency,
+            base_currency=base_currency or ident.base_currency,
+            quote_currency=quote_currency or ident.quote_currency,
             pip_size=pip_size,
             point=point,
             digits=digits,
             contract_size=contract_size,
+            canonical_symbol=canonical_symbol or ident.canonical_symbol,
             metadata=metadata or {},
             created_at=datetime.now(),
             updated_at=datetime.now(),
@@ -159,7 +165,7 @@ class MarketRepository(BaseRepository[Market]):
     
     def find_by_symbol(self, symbol: str) -> Optional[Market]:
         """
-        Find a market by symbol.
+        Find a market by broker symbol (first match).
         
         Args:
             symbol: Market symbol
@@ -172,6 +178,27 @@ class MarketRepository(BaseRepository[Market]):
             (symbol,)
         )
         return self._row_to_entity(row) if row else None
+
+    def find_by_broker_symbol(self, broker_id: int, symbol: str) -> Optional[Market]:
+        """Find a market by broker + local symbol name."""
+        row = self.adapter.fetch_one(
+            f"SELECT * FROM {self.TABLE} WHERE broker_id = ? AND symbol = ?",
+            (broker_id, symbol),
+        )
+        return self._row_to_entity(row) if row else None
+
+    def find_by_canonical(self, canonical_symbol: str) -> List[Market]:
+        """
+        Find all broker markets that map to the same canonical instrument.
+        """
+        from core.symbol_identity import canonicalize
+
+        canon = canonicalize(canonical_symbol).canonical_symbol
+        rows = self.adapter.fetch_all(
+            f"SELECT * FROM {self.TABLE} WHERE canonical_symbol = ?",
+            (canon,),
+        )
+        return [self._row_to_entity(row) for row in rows]
     
     def find_by_broker(self, broker_id: int) -> List[Market]:
         """
@@ -543,6 +570,7 @@ class MarketRepository(BaseRepository[Market]):
             'market_id': market.market_id,
             'broker_id': market.broker_id,
             'symbol': market.symbol,
+            'canonical_symbol': market.canonical_symbol,
             'market_type': market.market_type.value if market.market_type else None,
             'status': market.status.value if market.status else None,
             'description': market.description,
@@ -572,6 +600,7 @@ class MarketRepository(BaseRepository[Market]):
             point=row['point'],
             digits=row['digits'],
             contract_size=row['contract_size'],
+            canonical_symbol=row.get('canonical_symbol'),
             metadata=json.loads(row['metadata']) if row['metadata'] else {},
             created_at=datetime.fromisoformat(row['created_at']) if row['created_at'] else None,
             updated_at=datetime.fromisoformat(row['updated_at']) if row['updated_at'] else None,

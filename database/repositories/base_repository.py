@@ -382,6 +382,18 @@ class BaseRepository(Generic[T]):
         
         # Remove ID if present (auto-increment)
         data = {k: v for k, v in data.items() if k != 'id'}
+        # Drop null primary-key style fields so SQLite can autoincrement
+        for pk in (
+            "market_id",
+            "candle_id",
+            "broker_id",
+            "currency_id",
+            "timeframe_id",
+            "tick_id",
+            "symbol_id",
+        ):
+            if pk in data and data[pk] is None:
+                data.pop(pk)
         
         fields = list(data.keys())
         placeholders = ", ".join("?" for _ in fields)
@@ -742,6 +754,14 @@ class BaseRepository(Generic[T]):
                 repo.insert(data2)
         """
         return self.adapter.transaction()
+
+    def _get_connection(self):
+        """
+        Compatibility helper used by CandleRepository/TimeframeRepository.
+
+        Yields the raw DB connection from the adapter.
+        """
+        return self.adapter.get_connection()
     
     # ==========================================================================
     # UTILITY METHODS
